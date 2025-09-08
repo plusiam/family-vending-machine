@@ -3,90 +3,800 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Think-Puzzle-Explore | 생각이 보이는 교실 - 사고가시화 도구 툴킷</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>우리 가족 자판기 만들기</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
-        
         * {
-            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         :root {
-            --primary-color: #6366f1;
-            --secondary-color: #8b5cf6;
-            --accent-color: #ec4899;
-            --think-color: #f97316;
-            --puzzle-color: #06b6d4;
-            --explore-color: #d946ef;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --theme-light: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --theme-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --theme-pastel: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
         }
         
-        .gradient-text {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s ease;
         }
         
-        .glass-morphism {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        body.dark-theme {
+            background: var(--theme-dark);
         }
         
-        .think-gradient {
-            background: linear-gradient(135deg, #fed7aa, #fb923c);
+        body.pastel-theme {
+            background: var(--theme-pastel);
         }
         
-        .puzzle-gradient {
-            background: linear-gradient(135deg, #a5f3fc, #22d3ee);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        .explore-gradient {
-            background: linear-gradient(135deg, #f9a8d4, #ec4899);
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
         }
         
-        .tool-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
         
-        .tool-card:hover {
-            transform: translateY(-5px);
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .theme-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .theme-btn {
+            padding: 8px 15px;
+            border: 2px solid white;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .theme-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .theme-btn.active {
+            background: white;
+            color: #333;
+        }
+        
+        .tab-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        
-        .sticky-note {
-            background: #fef3c7;
+            animation: fadeInUp 0.8s ease;
             position: relative;
-            padding: 15px;
-            margin: 10px 0;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            transform: rotate(-1deg);
-            transition: all 0.2s ease;
         }
         
-        .sticky-note:hover {
-            transform: rotate(0deg) scale(1.02);
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.15);
-        }
-        
-        .sticky-note::before {
-            content: '';
+        .help-button {
             position: absolute;
-            top: -5px;
-            left: 30%;
-            width: 40px;
-            height: 10px;
-            background: rgba(0,0,0,0.1);
-            transform: rotate(-5deg);
+            top: 20px;
+            right: 20px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            z-index: 10;
         }
         
-        @keyframes slideInUp {
+        .help-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .tooltip.show {
+            opacity: 1;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .tab-button {
+            padding: 12px 25px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .vending-machine {
+            background: linear-gradient(145deg, #e6e6e6, #ffffff);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 
+                inset 0 2px 4px rgba(0,0,0,0.1),
+                0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .machine-header {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .machine-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+        
+        .machine-header h2 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+            position: relative;
+        }
+        
+        .machine-header input {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 1.1em;
+            margin-top: 10px;
+            width: 60%;
+            text-align: center;
+            position: relative;
+        }
+        
+        .button-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .control-btn {
+            padding: 8px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+            min-height: 200px;
+        }
+        
+        .vending-button {
+            background: linear-gradient(145deg, #f0f0f0, #ffffff);
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 15px;
+            min-height: 120px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: buttonPop 0.3s ease;
+        }
+        
+        @keyframes buttonPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .vending-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+        
+        .vending-button.filled {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+            animation: fillAnimation 0.3s ease;
+        }
+        
+        @keyframes fillAnimation {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.95);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .vending-button.pressed {
+            animation: pressAnimation 0.3s ease;
+        }
+        
+        @keyframes pressAnimation {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .button-number {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.1);
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .button-emoji {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: block;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .button-emoji:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+        
+        .button-label {
+            text-align: center;
+            font-weight: 500;
+            word-break: keep-all;
+            line-height: 1.3;
+        }
+        
+        .button-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 0.95em;
+            color: inherit;
+            outline: none;
+            font-weight: 500;
+        }
+        
+        .button-input::placeholder {
+            color: #999;
+        }
+        
+        .button-delete {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(244, 67, 54, 0.8);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8em;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .vending-button:hover .button-delete {
+            display: flex;
+        }
+        
+        .emoji-picker {
+            position: absolute;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            padding: 10px;
+            display: none;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .emoji-picker.show {
+            display: grid;
+        }
+        
+        .emoji-option {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 1.5em;
+        }
+        
+        .emoji-option:hover {
+            background: #f0f0f0;
+            transform: scale(1.2);
+        }
+        
+        .sticker-panel {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+        }
+        
+        .sticker {
+            font-size: 1.5em;
+            cursor: grab;
+            transition: transform 0.2s ease;
+        }
+        
+        .sticker:hover {
+            transform: scale(1.2);
+        }
+        
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .tutorial-overlay.show {
+            display: flex;
+        }
+        
+        .tutorial-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .tutorial-content h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .tutorial-steps {
+            text-align: left;
+            margin: 20px 0;
+        }
+        
+        .tutorial-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .gallery-view {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .gallery-view.show {
+            display: block;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .gallery-item {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .template-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .template-btn {
+            padding: 8px 15px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        
+        .template-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .action-button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .save-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .print-button {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+        
+        .reset-button {
+            background: #f44336;
+            color: white;
+        }
+        
+        .capture-button {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+        }
+        
+        .capture-all-button {
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+            color: white;
+        }
+        
+        .gallery-button {
+            background: linear-gradient(135deg, #00BCD4, #00ACC1);
+            color: white;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .preview-content {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .preview-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .close-modal {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+        
+        .background-selector {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .bg-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .bg-option:hover,
+        .bg-option.selected {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+        
+        .watermark-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+        
+        .watermark-input {
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            font-size: 1em;
+            width: 200px;
+        }
+        
+        .collage-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+        }
+        
+        .collage-title {
+            grid-column: span 2;
+            text-align: center;
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .collage-item {
+            transform: scale(0.9);
+        }
+        
+        .saved-message {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            animation: slideInUp 0.5s ease;
+        }
+        
+        .saved-machines {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .saved-machines h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .saved-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .load-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        /* 음향 효과 표시 */
+        .sound-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: none;
+            animation: fadeInOut 0.5s ease;
+        }
+        
+        .sound-indicator.show {
+            display: block;
+        }
+        
+        @keyframes fadeInDown {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(-20px);
             }
             to {
                 opacity: 1;
@@ -94,635 +804,855 @@
             }
         }
         
-        .animate-in {
-            animation: slideInUp 0.5s ease-out forwards;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        .thinking-routine-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-left: 8px;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
         
-        .step-indicator {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-            font-size: 1.2rem;
+        @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
         }
         
-        .think-step { background: #f97316; }
-        .puzzle-step { background: #06b6d4; }
-        .explore-step { background: #d946ef; }
+        @keyframes slideInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes shimmer {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
         
         @media print {
-            .no-print { display: none !important; }
-            .print-break { page-break-inside: avoid; }
-            body { background: white !important; }
+            body {
+                background: white;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+            
+            .header {
+                color: black;
+            }
+            
+            .actions,
+            .tabs,
+            .theme-selector,
+            .help-button {
+                display: none;
+            }
+            
+            .tab-content {
+                display: block !important;
+                page-break-after: always;
+            }
+            
+            .vending-machine {
+                box-shadow: none;
+                border: 2px solid #333;
+            }
         }
         
-        .toolkit-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .toolkit-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M50 30c11.046 0 20 8.954 20 20s-8.954 20-20 20-20-8.954-20-20 8.954-20 20-20zm0 5c-8.284 0-15 6.716-15 15s6.716 15 15 15 15-6.716 15-15-6.716-15-15-15z'/%3E%3C/g%3E%3C/svg%3E") repeat;
-            animation: float 20s infinite linear;
-        }
-        
-        @keyframes float {
-            from { transform: translate(0, 0); }
-            to { transform: translate(-100px, -100px); }
-        }
-        
-        .flow-connector {
-            position: absolute;
-            top: 50%;
-            right: -30px;
-            width: 60px;
-            height: 2px;
-            background: linear-gradient(90deg, #e5e7eb, transparent);
-            z-index: 1;
-        }
-        
-        .flow-connector::after {
-            content: '▶';
-            position: absolute;
-            right: -10px;
-            top: -8px;
-            color: #e5e7eb;
-            font-size: 14px;
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .buttons-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .action-button {
+                width: 100%;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- GitHub Pages 스타일 헤더 -->
-    <header class="toolkit-header text-white py-8 relative">
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="flex items-center mb-2">
-                        <i class="fas fa-brain text-3xl mr-3"></i>
-                        <h1 class="text-3xl font-bold">생각이 보이는 교실</h1>
-                    </div>
-                    <p class="text-purple-100 text-lg">사고가시화 도구 툴킷 (Thinking Routines Toolkit)</p>
-                    <div class="mt-3 flex items-center gap-4">
-                        <span class="text-sm opacity-90">
-                            <i class="fas fa-book mr-1"></i> Based on "Making Thinking Visible"
-                        </span>
-                        <span class="thinking-routine-badge">Thinking Routine #1</span>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <a href="#" class="text-white hover:text-purple-200 transition mr-4">
-                        <i class="fab fa-github mr-1"></i> GitHub
-                    </a>
-                    <button onclick="showInfo()" class="bg-white bg-opacity-20 px-4 py-2 rounded-lg hover:bg-opacity-30 transition">
-                        <i class="fas fa-info-circle mr-1"></i> 도구 정보
-                    </button>
-                </div>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎰 우리 가족 자판기 만들기</h1>
+            <p>《엄마 자판기》 그림책을 읽고 우리 가족만의 특별한 자판기를 만들어보세요!</p>
+            <div class="theme-selector">
+                <button class="theme-btn active" onclick="changeTheme('light')">🌞 밝은 테마</button>
+                <button class="theme-btn" onclick="changeTheme('dark')">🌙 다크 테마</button>
+                <button class="theme-btn" onclick="changeTheme('pastel')">🌸 파스텔 테마</button>
             </div>
         </div>
-    </header>
-
-    <!-- 도구 제목 섹션 -->
-    <section class="bg-white border-b">
-        <div class="container mx-auto px-6 py-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-3xl font-bold gradient-text mb-2">Think-Puzzle-Explore</h2>
-                    <p class="text-gray-600">알고 있는 것에서 출발하는 탐구 설계 | 사전 지식 활성화와 탐구 질문 생성</p>
-                </div>
-                <div class="flex gap-2 no-print">
-                    <button onclick="resetForm()" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition">
-                        <i class="fas fa-redo mr-1"></i> 초기화
-                    </button>
-                    <button onclick="saveProject()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                        <i class="fas fa-save mr-1"></i> 저장
-                    </button>
-                </div>
+        
+        <div class="tab-container">
+            <button class="help-button" onclick="showTutorial()" title="도움말">?</button>
+            
+            <div class="template-selector">
+                <button class="template-btn" onclick="loadTemplate('basic')">📚 기본 템플릿</button>
+                <button class="template-btn" onclick="loadTemplate('active')">⚽ 활동적 템플릿</button>
+                <button class="template-btn" onclick="loadTemplate('creative')">🎨 창의적 템플릿</button>
+                <button class="template-btn" onclick="loadTemplate('study')">📖 학습 템플릿</button>
             </div>
-        </div>
-    </section>
-
-    <!-- 메인 컨텐츠 -->
-    <div class="container mx-auto px-6 py-8">
-        <!-- 주제 입력 영역 -->
-        <div class="glass-morphism rounded-xl p-6 mb-8 animate-in">
-            <div class="grid md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-bookmark mr-1"></i> 탐구 주제
-                    </label>
-                    <input 
-                        type="text" 
-                        id="topic" 
-                        placeholder="탐구하고자 하는 주제를 입력하세요"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition"
-                    >
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-user-graduate mr-1"></i> 학습자
-                        </label>
-                        <input 
-                            type="text" 
-                            id="learner" 
-                            placeholder="이름 또는 학급"
-                            class="w-full px-3 py-3 border border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none"
-                        >
+            
+            <div class="tabs">
+                <button class="tab-button active" onclick="showTab('mom')">👩 엄마 자판기</button>
+                <button class="tab-button" onclick="showTab('dad')">👨 아빠 자판기</button>
+                <button class="tab-button" onclick="showTab('daughter')">👧 딸 자판기</button>
+                <button class="tab-button" onclick="showTab('son')">👦 아들 자판기</button>
+            </div>
+            
+            <!-- 엄마 자판기 -->
+            <div id="mom-tab" class="tab-content active">
+                <div class="vending-machine">
+                    <div class="machine-header">
+                        <h2>엄마 자판기</h2>
+                        <input type="text" placeholder="엄마 이름 입력" class="name-input" data-role="mom">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-calendar mr-1"></i> 날짜
-                        </label>
-                        <input 
-                            type="date" 
-                            id="date" 
-                            class="w-full px-3 py-3 border border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none"
-                        >
+                    <div class="button-controls">
+                        <button class="control-btn" onclick="addButton('mom')">➕ 버튼 추가</button>
+                        <button class="control-btn" onclick="showSampleButtons('mom')">💡 예시 보기</button>
+                    </div>
+                    <div class="buttons-grid" id="mom-buttons"></div>
+                    <div class="sticker-panel">
+                        <span class="sticker">⭐</span>
+                        <span class="sticker">❤️</span>
+                        <span class="sticker">🌈</span>
+                        <span class="sticker">✨</span>
+                        <span class="sticker">🎁</span>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- 3단계 사고 루틴 카드 -->
-        <div class="grid lg:grid-cols-3 gap-6 mb-8">
-            <!-- Think 카드 -->
-            <div class="tool-card bg-white rounded-xl shadow-lg overflow-hidden print-break relative">
-                <div class="think-gradient p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <div class="step-indicator think-step">1</div>
-                            <div class="ml-3">
-                                <h3 class="text-xl font-bold text-orange-900">Think</h3>
-                                <p class="text-orange-700 text-sm">이미 알고 있는 것은?</p>
-                            </div>
-                        </div>
+            
+            <!-- 아빠 자판기 -->
+            <div id="dad-tab" class="tab-content">
+                <div class="vending-machine">
+                    <div class="machine-header">
+                        <h2>아빠 자판기</h2>
+                        <input type="text" placeholder="아빠 이름 입력" class="name-input" data-role="dad">
                     </div>
-                </div>
-                <div class="p-6">
-                    <div class="mb-4">
-                        <p class="text-sm text-gray-600 mb-3">
-                            <i class="fas fa-lightbulb mr-1 text-orange-500"></i>
-                            이 주제에 대해 이미 알고 있는 사실, 개념, 경험을 떠올려보세요.
-                        </p>
-                        <textarea 
-                            id="thinkInput"
-                            rows="10"
-                            placeholder="• 이미 알고 있는 사실들&#10;• 관련된 경험이나 배운 내용&#10;• 떠오르는 개념이나 아이디어&#10;• 연관된 지식이나 정보"
-                            class="w-full p-4 border-2 border-orange-200 rounded-lg focus:border-orange-400 focus:outline-none resize-none"
-                        ></textarea>
+                    <div class="button-controls">
+                        <button class="control-btn" onclick="addButton('dad')">➕ 버튼 추가</button>
+                        <button class="control-btn" onclick="showSampleButtons('dad')">💡 예시 보기</button>
                     </div>
-                    <div id="thinkNotes" class="space-y-2"></div>
-                    <button onclick="addNote('think')" class="text-orange-600 hover:text-orange-700 text-sm mt-2">
-                        <i class="fas fa-plus-circle mr-1"></i>메모 추가
-                    </button>
-                </div>
-                <div class="flow-connector hidden lg:block"></div>
-            </div>
-
-            <!-- Puzzle 카드 -->
-            <div class="tool-card bg-white rounded-xl shadow-lg overflow-hidden print-break relative">
-                <div class="puzzle-gradient p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <div class="step-indicator puzzle-step">2</div>
-                            <div class="ml-3">
-                                <h3 class="text-xl font-bold text-cyan-900">Puzzle</h3>
-                                <p class="text-cyan-700 text-sm">궁금한 것은?</p>
-                            </div>
-                        </div>
+                    <div class="buttons-grid" id="dad-buttons"></div>
+                    <div class="sticker-panel">
+                        <span class="sticker">⭐</span>
+                        <span class="sticker">❤️</span>
+                        <span class="sticker">🌈</span>
+                        <span class="sticker">✨</span>
+                        <span class="sticker">🎁</span>
                     </div>
-                </div>
-                <div class="p-6">
-                    <div class="mb-4">
-                        <p class="text-sm text-gray-600 mb-3">
-                            <i class="fas fa-question-circle mr-1 text-cyan-500"></i>
-                            이 주제에 대해 더 알고 싶은 것, 의문점, 탐구 질문을 만들어보세요.
-                        </p>
-                        <textarea 
-                            id="puzzleInput"
-                            rows="10"
-                            placeholder="• 왜 ~일까?&#10;• 어떻게 ~할 수 있을까?&#10;• 만약 ~라면 어떻게 될까?&#10;• ~와 ~의 관계는 무엇일까?&#10;• 더 알고 싶은 것은?"
-                            class="w-full p-4 border-2 border-cyan-200 rounded-lg focus:border-cyan-400 focus:outline-none resize-none"
-                        ></textarea>
-                    </div>
-                    <div id="puzzleNotes" class="space-y-2"></div>
-                    <button onclick="addNote('puzzle')" class="text-cyan-600 hover:text-cyan-700 text-sm mt-2">
-                        <i class="fas fa-plus-circle mr-1"></i>메모 추가
-                    </button>
-                </div>
-                <div class="flow-connector hidden lg:block"></div>
-            </div>
-
-            <!-- Explore 카드 -->
-            <div class="tool-card bg-white rounded-xl shadow-lg overflow-hidden print-break">
-                <div class="explore-gradient p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <div class="step-indicator explore-step">3</div>
-                            <div class="ml-3">
-                                <h3 class="text-xl font-bold text-purple-900">Explore</h3>
-                                <p class="text-purple-700 text-sm">어떻게 알아볼까?</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div class="mb-4">
-                        <p class="text-sm text-gray-600 mb-3">
-                            <i class="fas fa-search mr-1 text-purple-500"></i>
-                            궁금한 것들을 탐구하기 위한 구체적인 방법과 계획을 세워보세요.
-                        </p>
-                        <textarea 
-                            id="exploreInput"
-                            rows="10"
-                            placeholder="• 조사 방법 (책, 인터넷, 논문)&#10;• 실험이나 관찰 계획&#10;• 전문가 인터뷰&#10;• 현장 조사나 체험&#10;• 자료 수집 및 분석 방법"
-                            class="w-full p-4 border-2 border-purple-200 rounded-lg focus:border-purple-400 focus:outline-none resize-none"
-                        ></textarea>
-                    </div>
-                    <div id="exploreNotes" class="space-y-2"></div>
-                    <button onclick="addNote('explore')" class="text-purple-600 hover:text-purple-700 text-sm mt-2">
-                        <i class="fas fa-plus-circle mr-1"></i>메모 추가
-                    </button>
                 </div>
             </div>
-        </div>
-
-        <!-- 도구 활용 팁 -->
-        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 mb-8">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-info-circle mr-2"></i>Think-Puzzle-Explore 활용 가이드
-            </h3>
-            <div class="grid md:grid-cols-3 gap-4">
-                <div class="bg-white rounded-lg p-4">
-                    <h4 class="font-semibold text-gray-800 mb-2">
-                        <i class="fas fa-brain text-orange-500 mr-2"></i>Think 단계
-                    </h4>
-                    <p class="text-sm text-gray-600">
-                        브레인스토밍으로 시작하세요. 작은 아이디어도 소중합니다. 
-                        사전 지식을 활성화하여 새로운 학습의 토대를 만듭니다.
-                    </p>
-                </div>
-                <div class="bg-white rounded-lg p-4">
-                    <h4 class="font-semibold text-gray-800 mb-2">
-                        <i class="fas fa-puzzle-piece text-cyan-500 mr-2"></i>Puzzle 단계
-                    </h4>
-                    <p class="text-sm text-gray-600">
-                        모든 질문을 가치있게 다루세요. 호기심이 학습의 원동력입니다. 
-                        깊이 있는 탐구 질문을 만들어보세요.
-                    </p>
-                </div>
-                <div class="bg-white rounded-lg p-4">
-                    <h4 class="font-semibold text-gray-800 mb-2">
-                        <i class="fas fa-compass text-purple-500 mr-2"></i>Explore 단계
-                    </h4>
-                    <p class="text-sm text-gray-600">
-                        탐구 방법을 구체적으로 계획하세요. 다양한 자료와 방법을 
-                        활용하여 깊이 있는 탐구를 설계합니다.
-                    </p>
+            
+            <!-- 딸 자판기 -->
+            <div id="daughter-tab" class="tab-content">
+                <div class="vending-machine">
+                    <div class="machine-header">
+                        <h2>딸 자판기</h2>
+                        <input type="text" placeholder="딸 이름 입력" class="name-input" data-role="daughter">
+                    </div>
+                    <div class="button-controls">
+                        <button class="control-btn" onclick="addButton('daughter')">➕ 버튼 추가</button>
+                        <button class="control-btn" onclick="showSampleButtons('daughter')">💡 예시 보기</button>
+                    </div>
+                    <div class="buttons-grid" id="daughter-buttons"></div>
+                    <div class="sticker-panel">
+                        <span class="sticker">⭐</span>
+                        <span class="sticker">❤️</span>
+                        <span class="sticker">🌈</span>
+                        <span class="sticker">✨</span>
+                        <span class="sticker">🎁</span>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- 액션 버튼 -->
-        <div class="flex flex-wrap justify-center gap-3 mb-8 no-print">
-            <button onclick="downloadPDF()" class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg hover:from-indigo-600 hover:to-purple-600 transition shadow-lg">
-                <i class="fas fa-file-pdf mr-2"></i>PDF 다운로드
-            </button>
-            <button onclick="printForm()" class="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                <i class="fas fa-print mr-2"></i>인쇄하기
-            </button>
-            <button onclick="shareLink()" class="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                <i class="fas fa-share-alt mr-2"></i>공유하기
-            </button>
-            <button onclick="exportData()" class="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                <i class="fas fa-download mr-2"></i>데이터 내보내기
-            </button>
-        </div>
-
-        <!-- 저장된 프로젝트 -->
-        <div class="glass-morphism rounded-xl p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-folder-open mr-2"></i>저장된 탐구 프로젝트
-            </h3>
-            <div id="savedProjects" class="grid md:grid-cols-3 gap-4">
-                <!-- 저장된 프로젝트가 여기 표시됩니다 -->
+            
+            <!-- 아들 자판기 -->
+            <div id="son-tab" class="tab-content">
+                <div class="vending-machine">
+                    <div class="machine-header">
+                        <h2>아들 자판기</h2>
+                        <input type="text" placeholder="아들 이름 입력" class="name-input" data-role="son">
+                    </div>
+                    <div class="button-controls">
+                        <button class="control-btn" onclick="addButton('son')">➕ 버튼 추가</button>
+                        <button class="control-btn" onclick="showSampleButtons('son')">💡 예시 보기</button>
+                    </div>
+                    <div class="buttons-grid" id="son-buttons"></div>
+                    <div class="sticker-panel">
+                        <span class="sticker">⭐</span>
+                        <span class="sticker">❤️</span>
+                        <span class="sticker">🌈</span>
+                        <span class="sticker">✨</span>
+                        <span class="sticker">🎁</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button class="action-button save-button" onclick="saveData()">💾 저장하기</button>
+                <button class="action-button capture-button" onclick="captureCurrentTab()">📸 이미지 저장</button>
+                <button class="action-button capture-all-button" onclick="captureAllMachines()">🖼️ 전체 저장</button>
+                <button class="action-button gallery-button" onclick="toggleGallery()">🎨 갤러리</button>
+                <button class="action-button print-button" onclick="printMachines()">🖨️ 인쇄하기</button>
+                <button class="action-button reset-button" onclick="resetCurrent()">🔄 초기화</button>
+            </div>
+            
+            <div class="saved-message" id="savedMessage">
+                ✅ 자판기가 저장되었습니다!
+            </div>
+            
+            <div class="gallery-view" id="galleryView">
+                <h3>🎨 우리 반 자판기 갤러리</h3>
+                <div class="gallery-grid" id="galleryGrid"></div>
+            </div>
+            
+            <div class="saved-machines" id="savedMachines">
+                <h3>📁 저장된 자판기들</h3>
+                <div id="savedList"></div>
             </div>
         </div>
     </div>
-
-    <!-- 정보 모달 -->
-    <div id="infoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6">
-            <div class="flex justify-between items-start mb-4">
-                <h2 class="text-2xl font-bold gradient-text">Think-Puzzle-Explore 소개</h2>
-                <button onclick="closeInfo()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+    
+    <!-- 이모지 선택기 -->
+    <div class="emoji-picker" id="emojiPicker">
+        <span class="emoji-option">🍕</span>
+        <span class="emoji-option">🎮</span>
+        <span class="emoji-option">📚</span>
+        <span class="emoji-option">🎨</span>
+        <span class="emoji-option">🤗</span>
+        <span class="emoji-option">🎵</span>
+        <span class="emoji-option">🍰</span>
+        <span class="emoji-option">⚽</span>
+        <span class="emoji-option">✨</span>
+        <span class="emoji-option">🚗</span>
+        <span class="emoji-option">🎣</span>
+        <span class="emoji-option">🛠️</span>
+        <span class="emoji-option">📖</span>
+        <span class="emoji-option">🍖</span>
+        <span class="emoji-option">🏔️</span>
+        <span class="emoji-option">🎬</span>
+        <span class="emoji-option">💝</span>
+        <span class="emoji-option">🎤</span>
+        <span class="emoji-option">💃</span>
+        <span class="emoji-option">🧘‍♀️</span>
+        <span class="emoji-option">🏃‍♀️</span>
+        <span class="emoji-option">🌈</span>
+        <span class="emoji-option">💪</span>
+        <span class="emoji-option">🚀</span>
+        <span class="emoji-option">🎸</span>
+        <span class="emoji-option">😊</span>
+        <span class="emoji-option">🎯</span>
+        <span class="emoji-option">🎪</span>
+        <span class="emoji-option">🎭</span>
+        <span class="emoji-option">🏆</span>
+    </div>
+    
+    <!-- 튜토리얼 오버레이 -->
+    <div class="tutorial-overlay" id="tutorialOverlay">
+        <div class="tutorial-content">
+            <h2>🎯 자판기 만들기 방법</h2>
+            <div class="tutorial-steps">
+                <div class="tutorial-step">
+                    <span class="step-number">1</span>
+                    <span>가족 구성원의 이름을 입력하세요</span>
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">2</span>
+                    <span>➕ 버튼으로 원하는 만큼 버튼을 추가하세요</span>
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">3</span>
+                    <span>이모지를 클릭해서 변경할 수 있어요</span>
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">4</span>
+                    <span>각 버튼에 원하는 역할을 입력하세요</span>
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">5</span>
+                    <span>버튼을 클릭하면 색상이 변해요</span>
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">6</span>
+                    <span>완성되면 이미지로 저장하거나 인쇄하세요</span>
+                </div>
             </div>
-            <div class="prose max-w-none">
-                <p class="text-gray-600 mb-4">
-                    Think-Puzzle-Explore는 Harvard Project Zero에서 개발한 사고 루틴(Thinking Routine)으로, 
-                    Ron Ritchhart의 "Making Thinking Visible" 프레임워크의 핵심 도구 중 하나입니다.
-                </p>
-                <h3 class="text-lg font-semibold mb-2">사고 루틴이란?</h3>
-                <p class="text-gray-600 mb-4">
-                    사고 루틴은 학습자의 사고를 가시화하고 구조화하는 간단하면서도 강력한 도구입니다. 
-                    반복적으로 사용함으로써 깊이 있는 사고 습관을 기를 수 있습니다.
-                </p>
-                <h3 class="text-lg font-semibold mb-2">언제 사용하나요?</h3>
-                <ul class="list-disc list-inside text-gray-600 mb-4">
-                    <li>새로운 단원이나 주제를 시작할 때</li>
-                    <li>학습자의 사전 지식을 활성화하고 싶을 때</li>
-                    <li>탐구 학습을 설계할 때</li>
-                    <li>학습자 주도의 질문을 이끌어내고 싶을 때</li>
-                </ul>
-                <h3 class="text-lg font-semibold mb-2">GitHub Education</h3>
-                <p class="text-gray-600">
-                    이 도구는 교육자와 학습자를 위한 오픈소스 프로젝트입니다. 
-                    GitHub Pages를 통해 무료로 호스팅되며, 누구나 자유롭게 사용하고 개선할 수 있습니다.
-                </p>
+            <button class="action-button" onclick="closeTutorial()">시작하기!</button>
+        </div>
+    </div>
+    
+    <!-- 미리보기 모달 -->
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content">
+            <div class="preview-header">
+                <h3>📸 이미지 미리보기</h3>
+                <button class="close-modal" onclick="closePreview()">✕</button>
+            </div>
+            
+            <div class="background-selector">
+                <span style="margin-right: 10px;">배경색:</span>
+                <div class="bg-option selected" style="background: linear-gradient(135deg, #667eea, #764ba2)" onclick="changeBackground(this, 'gradient1')"></div>
+                <div class="bg-option" style="background: linear-gradient(135deg, #f093fb, #f5576c)" onclick="changeBackground(this, 'gradient2')"></div>
+                <div class="bg-option" style="background: linear-gradient(135deg, #4facfe, #00f2fe)" onclick="changeBackground(this, 'gradient3')"></div>
+                <div class="bg-option" style="background: linear-gradient(135deg, #43e97b, #38f9d7)" onclick="changeBackground(this, 'gradient4')"></div>
+                <div class="bg-option" style="background: #ffffff" onclick="changeBackground(this, 'white')"></div>
+                <div class="bg-option" style="background: #f5f5f5" onclick="changeBackground(this, 'gray')"></div>
+            </div>
+            
+            <div class="watermark-control">
+                <label>워터마크:</label>
+                <input type="text" class="watermark-input" id="watermarkText" placeholder="예: 00초등학교 3-1반">
+                <button class="action-button" style="padding: 8px 15px;" onclick="applyWatermark()">적용</button>
+            </div>
+            
+            <div id="previewImage"></div>
+            
+            <div class="preview-actions">
+                <button class="download-btn" onclick="downloadImage()">💾 다운로드</button>
             </div>
         </div>
     </div>
-
+    
+    <!-- 음향 효과 표시 -->
+    <div class="sound-indicator" id="soundIndicator">🔊 효과음</div>
+    
+    <!-- 툴팁 -->
+    <div class="tooltip" id="tooltip"></div>
+    
     <script>
+        // 전역 변수
+        let currentImageData = null;
+        let currentBackground = 'gradient1';
+        let currentWatermark = '';
+        let captureType = 'single';
+        let currentEmojiButton = null;
+        let buttonCounter = {};
+        let soundEnabled = true;
+        
+        // 템플릿 데이터
+        const templates = {
+            basic: {
+                mom: [
+                    {emoji: '🍕', label: '피자맘'},
+                    {emoji: '🎮', label: '놀이맘'},
+                    {emoji: '📚', label: '책맘'},
+                    {emoji: '🎨', label: '그림맘'},
+                    {emoji: '🤗', label: '안아주는맘'},
+                    {emoji: '🎵', label: '노래맘'},
+                    {emoji: '🍰', label: '요리맘'},
+                    {emoji: '⚽', label: '운동맘'},
+                    {emoji: '✨', label: '자유맘'}
+                ],
+                dad: [
+                    {emoji: '🚗', label: '드라이브빠'},
+                    {emoji: '⚽', label: '축구빠'},
+                    {emoji: '🎣', label: '낚시빠'},
+                    {emoji: '🛠️', label: '만들기빠'},
+                    {emoji: '🎮', label: '게임빠'},
+                    {emoji: '📖', label: '책빠'},
+                    {emoji: '🍖', label: '바베큐빠'},
+                    {emoji: '🏔️', label: '등산빠'},
+                    {emoji: '🎬', label: '영화빠'}
+                ],
+                daughter: [
+                    {emoji: '💝', label: '애교딸'},
+                    {emoji: '🎤', label: '노래딸'},
+                    {emoji: '💃', label: '춤딸'},
+                    {emoji: '📚', label: '공부딸'},
+                    {emoji: '🎨', label: '그림딸'},
+                    {emoji: '🧘‍♀️', label: '차분딸'},
+                    {emoji: '🎮', label: '게임딸'},
+                    {emoji: '🏃‍♀️', label: '운동딸'},
+                    {emoji: '🌈', label: '밝은딸'}
+                ],
+                son: [
+                    {emoji: '💪', label: '힘센아들'},
+                    {emoji: '🎮', label: '게임아들'},
+                    {emoji: '⚽', label: '축구아들'},
+                    {emoji: '🚀', label: '모험아들'},
+                    {emoji: '🤗', label: '다정아들'},
+                    {emoji: '📚', label: '공부아들'},
+                    {emoji: '🎸', label: '음악아들'},
+                    {emoji: '🎨', label: '예술아들'},
+                    {emoji: '😊', label: '웃음아들'}
+                ]
+            },
+            active: {
+                mom: [
+                    {emoji: '🏃', label: '달리기맘'},
+                    {emoji: '🚴', label: '자전거맘'},
+                    {emoji: '🏊', label: '수영맘'},
+                    {emoji: '⛷️', label: '스키맘'},
+                    {emoji: '🏸', label: '배드민턴맘'}
+                ],
+                dad: [
+                    {emoji: '🏀', label: '농구빠'},
+                    {emoji: '🏈', label: '럭비빠'},
+                    {emoji: '🎾', label: '테니스빠'},
+                    {emoji: '🏓', label: '탁구빠'},
+                    {emoji: '🥊', label: '복싱빠'}
+                ],
+                daughter: [
+                    {emoji: '🤸', label: '체조딸'},
+                    {emoji: '🏐', label: '배구딸'},
+                    {emoji: '⛸️', label: '스케이트딸'},
+                    {emoji: '🎿', label: '스키딸'},
+                    {emoji: '🏹', label: '양궁딸'}
+                ],
+                son: [
+                    {emoji: '🥋', label: '태권도아들'},
+                    {emoji: '🏏', label: '크리켓아들'},
+                    {emoji: '🏑', label: '하키아들'},
+                    {emoji: '🤺', label: '펜싱아들'},
+                    {emoji: '🏋️', label: '역도아들'}
+                ]
+            },
+            creative: {
+                mom: [
+                    {emoji: '🎨', label: '화가맘'},
+                    {emoji: '✏️', label: '작가맘'},
+                    {emoji: '📸', label: '사진맘'},
+                    {emoji: '🎭', label: '연극맘'},
+                    {emoji: '🎪', label: '서커스맘'}
+                ],
+                dad: [
+                    {emoji: '🎬', label: '감독빠'},
+                    {emoji: '🎤', label: '가수빠'},
+                    {emoji: '🎸', label: '기타빠'},
+                    {emoji: '🥁', label: '드럼빠'},
+                    {emoji: '🎹', label: '피아노빠'}
+                ],
+                daughter: [
+                    {emoji: '🩰', label: '발레딸'},
+                    {emoji: '🎨', label: '미술딸'},
+                    {emoji: '📝', label: '시인딸'},
+                    {emoji: '🎭', label: '배우딸'},
+                    {emoji: '🎪', label: '마술딸'}
+                ],
+                son: [
+                    {emoji: '🎺', label: '트럼펫아들'},
+                    {emoji: '🎷', label: '색소폰아들'},
+                    {emoji: '🎻', label: '바이올린아들'},
+                    {emoji: '🎨', label: '조각가아들'},
+                    {emoji: '📷', label: '사진가아들'}
+                ]
+            },
+            study: {
+                mom: [
+                    {emoji: '📖', label: '독서맘'},
+                    {emoji: '🔬', label: '과학맘'},
+                    {emoji: '🧮', label: '수학맘'},
+                    {emoji: '🌍', label: '지리맘'},
+                    {emoji: '📚', label: '역사맘'}
+                ],
+                dad: [
+                    {emoji: '💻', label: '코딩빠'},
+                    {emoji: '🔭', label: '천문빠'},
+                    {emoji: '🧬', label: '생물빠'},
+                    {emoji: '⚗️', label: '화학빠'},
+                    {emoji: '📐', label: '기하빠'}
+                ],
+                daughter: [
+                    {emoji: '📝', label: '글쓰기딸'},
+                    {emoji: '🗣️', label: '토론딸'},
+                    {emoji: '🌐', label: '언어딸'},
+                    {emoji: '🎓', label: '학구적딸'},
+                    {emoji: '📊', label: '통계딸'}
+                ],
+                son: [
+                    {emoji: '🤖', label: '로봇아들'},
+                    {emoji: '🔧', label: '공학아들'},
+                    {emoji: '🏛️', label: '철학아들'},
+                    {emoji: '⚖️', label: '법률아들'},
+                    {emoji: '💰', label: '경제아들'}
+                ]
+            }
+        };
+        
         // 초기화
-        document.addEventListener('DOMContentLoaded', function() {
-            // 오늘 날짜 설정
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('date').value = today;
+        window.addEventListener('load', () => {
+            initializeTabs();
+            updateSavedList();
             
-            // 저장된 데이터 불러오기
-            loadSavedData();
-            loadProjects();
-            
-            // 자동 저장 설정 (30초마다)
-            setInterval(autoSave, 30000);
+            // 처음 방문 시 튜토리얼 표시
+            if (!localStorage.getItem('tutorialShown')) {
+                setTimeout(showTutorial, 500);
+                localStorage.setItem('tutorialShown', 'true');
+            }
         });
-
-        // 데이터 저장
-        function saveData() {
-            const data = {
-                topic: document.getElementById('topic').value,
-                learner: document.getElementById('learner').value,
-                date: document.getElementById('date').value,
-                think: document.getElementById('thinkInput').value,
-                puzzle: document.getElementById('puzzleInput').value,
-                explore: document.getElementById('exploreInput').value,
-                timestamp: new Date().toISOString()
+        
+        // 탭별 초기 버튼 설정
+        function initializeTabs() {
+            ['mom', 'dad', 'daughter', 'son'].forEach(role => {
+                buttonCounter[role] = 0;
+                const container = document.getElementById(`${role}-buttons`);
+                
+                // 기본 9개 버튼 생성
+                templates.basic[role].forEach(btn => {
+                    addButton(role, btn);
+                });
+            });
+        }
+        
+        // 버튼 추가 함수
+        function addButton(role, buttonData = null) {
+            const container = document.getElementById(`${role}-buttons`);
+            buttonCounter[role]++;
+            
+            const button = document.createElement('div');
+            button.className = 'vending-button';
+            button.onclick = function(e) {
+                if (!e.target.classList.contains('button-delete') && 
+                    !e.target.classList.contains('button-emoji') &&
+                    !e.target.classList.contains('button-input')) {
+                    toggleButton(this);
+                }
             };
             
-            localStorage.setItem('tpe_current', JSON.stringify(data));
-            return data;
-        }
-
-        // 자동 저장
-        function autoSave() {
-            if (document.getElementById('topic').value) {
-                saveData();
-                showNotification('자동 저장되었습니다');
-            }
-        }
-
-        // 프로젝트 저장
-        function saveProject() {
-            const topic = document.getElementById('topic').value;
-            if (!topic) {
-                alert('탐구 주제를 입력해주세요');
-                return;
-            }
+            const emoji = buttonData?.emoji || '🎯';
+            const label = buttonData?.label || `버튼${buttonCounter[role]}`;
             
-            const data = saveData();
-            data.id = Date.now();
-            
-            let projects = JSON.parse(localStorage.getItem('tpe_projects') || '[]');
-            projects.unshift(data);
-            projects = projects.slice(0, 9); // 최대 9개
-            
-            localStorage.setItem('tpe_projects', JSON.stringify(projects));
-            loadProjects();
-            showNotification('프로젝트가 저장되었습니다');
-        }
-
-        // 저장된 데이터 불러오기
-        function loadSavedData() {
-            const saved = localStorage.getItem('tpe_current');
-            if (saved) {
-                const data = JSON.parse(saved);
-                document.getElementById('topic').value = data.topic || '';
-                document.getElementById('learner').value = data.learner || '';
-                document.getElementById('date').value = data.date || '';
-                document.getElementById('thinkInput').value = data.think || '';
-                document.getElementById('puzzleInput').value = data.puzzle || '';
-                document.getElementById('exploreInput').value = data.explore || '';
-            }
-        }
-
-        // 프로젝트 목록 불러오기
-        function loadProjects() {
-            const projects = JSON.parse(localStorage.getItem('tpe_projects') || '[]');
-            const container = document.getElementById('savedProjects');
-            
-            if (projects.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center col-span-full">저장된 프로젝트가 없습니다</p>';
-                return;
-            }
-            
-            container.innerHTML = projects.map(project => `
-                <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-indigo-400 transition cursor-pointer" onclick="loadProject(${project.id})">
-                    <h4 class="font-semibold text-gray-800 mb-1 truncate">${project.topic}</h4>
-                    <p class="text-sm text-gray-600">${project.learner || '이름 없음'}</p>
-                    <p class="text-xs text-gray-500">${new Date(project.date).toLocaleDateString('ko-KR')}</p>
-                    <div class="mt-2 flex justify-between">
-                        <button onclick="event.stopPropagation(); deleteProject(${project.id})" class="text-red-500 hover:text-red-700 text-sm">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <button onclick="event.stopPropagation(); duplicateProject(${project.id})" class="text-blue-500 hover:text-blue-700 text-sm">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </div>
+            button.innerHTML = `
+                <button class="button-delete" onclick="deleteButton(this, event)">✕</button>
+                <span class="button-number">${buttonCounter[role]}</span>
+                <span class="button-emoji" onclick="showEmojiPicker(this, event)">${emoji}</span>
+                <div class="button-label">
+                    <input type="text" class="button-input" placeholder="${label}" maxlength="10">
                 </div>
-            `).join('');
-        }
-
-        // 프로젝트 불러오기
-        function loadProject(id) {
-            const projects = JSON.parse(localStorage.getItem('tpe_projects') || '[]');
-            const project = projects.find(p => p.id === id);
+            `;
             
-            if (project) {
-                document.getElementById('topic').value = project.topic || '';
-                document.getElementById('learner').value = project.learner || '';
-                document.getElementById('date').value = project.date || '';
-                document.getElementById('thinkInput').value = project.think || '';
-                document.getElementById('puzzleInput').value = project.puzzle || '';
-                document.getElementById('exploreInput').value = project.explore || '';
-                
-                saveData();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                showNotification('프로젝트를 불러왔습니다');
-            }
-        }
-
-        // 프로젝트 삭제
-        function deleteProject(id) {
-            if (confirm('이 프로젝트를 삭제하시겠습니까?')) {
-                let projects = JSON.parse(localStorage.getItem('tpe_projects') || '[]');
-                projects = projects.filter(p => p.id !== id);
-                localStorage.setItem('tpe_projects', JSON.stringify(projects));
-                loadProjects();
-                showNotification('프로젝트가 삭제되었습니다');
-            }
-        }
-
-        // 프로젝트 복제
-        function duplicateProject(id) {
-            const projects = JSON.parse(localStorage.getItem('tpe_projects') || '[]');
-            const project = projects.find(p => p.id === id);
+            container.appendChild(button);
+            playSound('add');
             
-            if (project) {
-                const newProject = { ...project, id: Date.now(), topic: project.topic + ' (복사본)' };
-                projects.unshift(newProject);
-                projects = projects.slice(0, 9);
-                localStorage.setItem('tpe_projects', JSON.stringify(projects));
-                loadProjects();
-                showNotification('프로젝트가 복제되었습니다');
+            // 툴팁 추가
+            addTooltip(button.querySelector('.button-emoji'), '클릭하여 이모지 변경');
+        }
+        
+        // 버튼 삭제
+        function deleteButton(btn, event) {
+            event.stopPropagation();
+            if (confirm('이 버튼을 삭제하시겠습니까?')) {
+                btn.parentElement.remove();
+                playSound('delete');
+                updateButtonNumbers();
             }
         }
-
-        // 메모 추가
-        function addNote(section) {
-            const text = prompt('추가할 메모를 입력하세요:');
-            if (text) {
-                const container = document.getElementById(section + 'Notes');
-                const note = document.createElement('div');
-                note.className = 'sticky-note rounded-lg';
-                note.innerHTML = `
-                    <button onclick="this.parentElement.remove()" class="float-right text-gray-500 hover:text-red-500">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <p class="text-sm pr-6">${text}</p>
-                `;
-                container.appendChild(note);
-            }
+        
+        // 버튼 번호 업데이트
+        function updateButtonNumbers() {
+            const activeTab = document.querySelector('.tab-content.active');
+            const buttons = activeTab.querySelectorAll('.vending-button');
+            buttons.forEach((button, index) => {
+                button.querySelector('.button-number').textContent = index + 1;
+            });
         }
-
-        // 초기화
-        function resetForm() {
-            if (confirm('모든 내용을 초기화하시겠습니까?')) {
-                document.getElementById('topic').value = '';
-                document.getElementById('learner').value = '';
-                document.getElementById('thinkInput').value = '';
-                document.getElementById('puzzleInput').value = '';
-                document.getElementById('exploreInput').value = '';
-                
-                document.getElementById('thinkNotes').innerHTML = '';
-                document.getElementById('puzzleNotes').innerHTML = '';
-                document.getElementById('exploreNotes').innerHTML = '';
-                
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('date').value = today;
-                
-                localStorage.removeItem('tpe_current');
-                showNotification('초기화되었습니다');
-            }
-        }
-
-        // 정보 모달
-        function showInfo() {
-            document.getElementById('infoModal').classList.remove('hidden');
-        }
-
-        function closeInfo() {
-            document.getElementById('infoModal').classList.add('hidden');
-        }
-
-        // PDF 다운로드 (실제로는 인쇄 기능 사용)
-        function downloadPDF() {
-            window.print();
-        }
-
-        // 인쇄
-        function printForm() {
-            window.print();
-        }
-
-        // 공유 링크
-        function shareLink() {
-            const data = saveData();
-            const shareText = `Think-Puzzle-Explore 탐구 결과\n\n` +
-                `📚 주제: ${data.topic}\n\n` +
-                `💭 Think: ${data.think}\n\n` +
-                `❓ Puzzle: ${data.puzzle}\n\n` +
-                `🔍 Explore: ${data.explore}`;
+        
+        // 이모지 선택기 표시
+        function showEmojiPicker(emojiElement, event) {
+            event.stopPropagation();
+            currentEmojiButton = emojiElement;
             
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Think-Puzzle-Explore: ' + data.topic,
-                    text: shareText
+            const picker = document.getElementById('emojiPicker');
+            const rect = emojiElement.getBoundingClientRect();
+            
+            picker.style.left = rect.left + 'px';
+            picker.style.top = rect.bottom + 5 + 'px';
+            picker.classList.add('show');
+            
+            // 이모지 선택 이벤트
+            picker.querySelectorAll('.emoji-option').forEach(option => {
+                option.onclick = function() {
+                    currentEmojiButton.textContent = this.textContent;
+                    picker.classList.remove('show');
+                    playSound('change');
+                };
+            });
+        }
+        
+        // 버튼 토글
+        function toggleButton(button) {
+            button.classList.toggle('filled');
+            button.classList.add('pressed');
+            setTimeout(() => button.classList.remove('pressed'), 300);
+            playSound('click');
+        }
+        
+        // 템플릿 로드
+        function loadTemplate(templateName) {
+            if (confirm(`${templateName} 템플릿을 불러오시겠습니까? 현재 내용이 대체됩니다.`)) {
+                ['mom', 'dad', 'daughter', 'son'].forEach(role => {
+                    const container = document.getElementById(`${role}-buttons`);
+                    container.innerHTML = '';
+                    buttonCounter[role] = 0;
+                    
+                    const templateData = templates[templateName][role] || templates.basic[role];
+                    templateData.forEach(btn => {
+                        addButton(role, btn);
+                    });
                 });
-            } else {
-                navigator.clipboard.writeText(shareText);
-                showNotification('클립보드에 복사되었습니다');
+                
+                alert('템플릿이 적용되었습니다!');
+                playSound('success');
             }
         }
-
-        // 데이터 내보내기
-        function exportData() {
-            const data = saveData();
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `TPE_${data.topic}_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showNotification('데이터를 내보냈습니다');
+        
+        // 예시 버튼 표시
+        function showSampleButtons(role) {
+            const samples = templates.basic[role];
+            let sampleText = `${getTabLabel(role)} 자판기 예시:\n\n`;
+            samples.forEach((sample, index) => {
+                sampleText += `${index + 1}. ${sample.emoji} ${sample.label}\n`;
+            });
+            alert(sampleText);
         }
-
-        // 알림 표시
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg animate-in z-50';
-            notification.textContent = message;
-            document.body.appendChild(notification);
+        
+        // 테마 변경
+        function changeTheme(theme) {
+            document.body.className = '';
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else if (theme === 'pastel') {
+                document.body.classList.add('pastel-theme');
+            }
             
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            playSound('change');
         }
-
-        // 텍스트 영역 자동 저장
-        document.querySelectorAll('textarea').forEach(textarea => {
-            textarea.addEventListener('input', saveData);
-        });
-
-        // 입력 필드 자동 저장
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('change', saveData);
-        });
-    </script>
-</body>
-</html>
+        
+        // 튜토리얼 표시
+        function showTutorial() {
+            document.getElementById('tutorialOverlay').classList.add('show');
+        }
+        
+        // 튜토리얼 닫기
+        function closeTutorial() {
+            document.getElementById('tutorialOverlay').classList.remove('show');
+        }
+        
+        // 갤러리 토글
+        function toggleGallery() {
+            const gallery = document.getElementById('galleryView');
+            gallery.classList.toggle('show');
+            
+            if (gallery.classList.contains('show')) {
+                updateGalleryView();
+            }
+        }
+        
+        // 갤러리 업데이트
+        function updateGalleryView() {
+            const savedData = JSON.parse(localStorage.getItem('familyVendingMachines') || '[]');
+            const galleryGrid = document.getElementById('galleryGrid');
+            
+            galleryGrid.innerHTML = savedData.map((item, index) => {
+                const date = new Date(item.timestamp).toLocaleDateString('ko-KR');
+                return `
+                    <div class="gallery-item">
+                        <h4>작품 #${index + 1}</h4>
+                        <p>📅 ${date}</p>
+                        <p>👩 ${item.machines.mom.name || '엄마'}</p>
+                        <p>👨 ${item.machines.dad.name || '아빠'}</p>
+                        <button class="load-button" onclick="loadData(${index})">불러오기</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 툴팁 추가
+        function addTooltip(element, text) {
+            element.addEventListener('mouseenter', function(e) {
+                const tooltip = document.getElementById('tooltip');
+                tooltip.textContent = text;
+                tooltip.style.left = e.pageX + 'px';
+                tooltip.style.top = (e.pageY - 30) + 'px';
+                tooltip.classList.add('show');
+            });
+            
+            element.addEventListener('mouseleave', function() {
+                document.getElementById('tooltip').classList.remove('show');
+            });
+        }
+        
+        // 효과음 재생
+        function playSound(type) {
+            if (!soundEnabled) return;
+            
+            const indicator = document.getElementById('soundIndicator');
+            indicator.classList.add('show');
+            
+            // 실제 오디오 재생 대신 시각적 피드백만 제공
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 500);
+        }
+        
+        // 탭 전환
+        function showTab(tabName) {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => button.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            const selectedButton = Array.from(tabButtons).find(button => 
+                button.textContent.includes(getTabLabel(tabName))
+            );
+            if (selectedButton) {
+                selectedButton.classList.add('active');
+            }
+            
+            const selectedContent = document.getElementById(`${tabName}-tab`);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+            
+            playSound('change');
+        }
+        
+        // 탭 레이블 가져오기
+        function getTabLabel(tabName) {
+            const labels = {
+                'mom': '엄마',
+                'dad': '아빠',
+                'daughter': '딸',
+                'son': '아들'
+            };
+            return labels[tabName] || '';
+        }
+        
+        // 현재 탭 캡처
+        async function captureCurrentTab() {
+            captureType = 'single';
+            const activeTab = document.querySelector('.tab-content.active');
+            const vendingMachine = activeTab.querySelector('.vending-machine');
+            
+            const originalStyle = vendingMachine.style.cssText;
+            vendingMachine.style.margin = '20px';
+            vendingMachine.style.background = getBackgroundStyle(currentBackground);
+            
+            let watermarkElement = null;
+            if (currentWatermark) {
+                watermarkElement = document.createElement('div');
+                watermarkElement.style.cssText = 'position: absolute; bottom: 10px; right: 10px; opacity: 0.5; font-size: 12px;';
+                watermarkElement.textContent = currentWatermark;
+                vendingMachine.style.position = 'relative';
+                vendingMachine.appendChild(watermarkElement);
+            }
+            
+            try {
+                const canvas = await html2canvas(vendingMachine, {
+                    backgroundColor: null,
+                    scale: 2,
+                    logging: false
+                });
+                
+                currentImageData = canvas.toDataURL('image/png');
+                showPreview(currentImageData);
+                
+            } catch (error) {
+                console.error('캡처 실패:', error);
+                alert('이미지 캡처에 실패했습니다.');
+            } finally {
+                vendingMachine.style.cssText = originalStyle;
+                if (watermarkElement) {
+                    vendingMachine.removeChild(watermarkElement);
+                }
+            }
+        }
+        
+        // 전체 자판기 캡처
+        async function captureAllMachines() {
+            captureType = 'all';
+            
+            const tempContainer = document.createElement('div');
+            tempContainer.className = 'collage-container';
+            tempContainer.style.cssText = 'position: absolute; left: -9999px; background: ' + getBackgroundStyle(currentBackground);
+            
+            const title = document.createElement('h2');
+            title.className = 'collage-title';
+            title.textContent = '우리 가족 자판기';
+            tempContainer.appendChild(title);
+            
+            const roles = ['mom', 'dad', 'daughter', 'son'];
+            for (const role of roles) {
+                const tab = document.getElementById(`${role}-tab`);
+                const machine = tab.querySelector('.vending-machine').cloneNode(true);
+                machine.className = 'vending-machine collage-item';
+                tempContainer.appendChild(machine);
+            }
+            
+            if (currentWatermark) {
+                const watermark = document.createElement('div');
+                watermark.style.cssText = 'position: absolute; bottom: 10px; right: 10px; opacity: 0.5; font-size: 14px;';
+                watermark.textContent = currentWatermark;
+                tempContainer.style.position = 'relative';
+                tempContainer.appendChild(watermark);
+            }
+            
+            document.body.appendChild(tempContainer);
+            
+            try {
+                const canvas = await html2canvas(tempContainer, {
+                    backgroundColor: null,
+                    scale: 2,
+                    logging: false,
+                    width: 1200,
+                    height: 1400
+                });
+                
+                currentImageData = canvas.toDataURL('image/png');
+                showPreview(currentImageData);
+                
+            } catch (error) {
+                console.error('전체 캡처 실패:', error);
+                alert('전체 이미지 캡처에 실패했습니다.');
+            } finally {
+                document.body.removeChild(tempContainer);
+            }
+        }
+        
+        // 배경 스타일 가져오기
+        function getBackgroundStyle(type) {
+            const backgrounds = {
+                'gradient1': 'linear-gradient(135deg, #667eea, #764ba2)',
+                'gradient2': 'linear-gradient(135deg, #f093fb, #f5576c)',
+                'gradient3': 'linear-gradient(135deg, #4facfe, #00f2fe)',
+                'gradient4': 'linear-gradient(135deg, #43e97b, #38f9d7)',
+                'white': '#ffffff',
+                'gray': '#f5f5f5'
