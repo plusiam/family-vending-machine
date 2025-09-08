@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Think-Puzzle-Explore | 생각이 보이는 교실 - 사고가시화 도구 툴킷</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+        
+        * {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-color: #ec4899;
+            --think-color: #f97316;
+            --puzzle-color: #06b6d4;
+            --explore-color: #d946ef;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .think-gradient {
+            background: linear-gradient(135deg, #fed7aa, #fb923c);
+        }
+        
+        .puzzle-gradient {
+            background: linear-gradient(135deg, #a5f3fc, #22d3ee);
+        }
+        
+        .explore-gradient {
+            background: linear-gradient(135deg, #f9a8d4, #ec4899);
+        }
+        
+        .tool-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .sticky-note {
+            background: #fef3c7;
+            position: relative;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            transform: rotate(-1deg);
+            transition: all 0.2s ease;
+        }
+        
+        .sticky-note:hover {
+            transform: rotate(0deg) scale(1.02);
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.15);
+        }
+        
+        .sticky-note::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 30%;
+            width: 40px;
+            height: 10px;
+            background: rgba(0,0,0,0.1);
+            transform: rotate(-5deg);
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-in {
+            animation: slideInUp 0.5s ease-out forwards;
+        }
+        
+        .thinking-routine-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        
+        .step-indicator {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .think-step { background: #f97316; }
+        .puzzle-step { background: #06b6d4; }
+        .explore-step { background: #d946ef; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .print-break { page-break-inside: avoid; }
+            body { background: white !important; }
+        }
+        
+        .toolkit-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .toolkit-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M50 30c11.046 0 20 8.954 20 20s-8.954 20-20 20-20-8.954-20-20 8.954-20 20-20zm0 5c-8.284 0-15 6.716-15 15s6.716 15 15 15 15-6.716 15-15-6.716-15-15-15z'/%3E%3C/g%3E%3C/svg%3E") repeat;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-100px, -100px); }
+        }
+        
+        .flow-connector {
+            position: absolute;
+            top: 50%;
+            right: -30px;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, #e5e7eb, transparent);
+            z-index: 1;
+        }
+        
+        .flow-connector::after {
+            content: '▶';
+            position: absolute;
+            right: -10px;
+            top: -8px;
+            color: #e5e7eb;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- GitHub Pages 스타일 헤더 -->
+    <header class="toolkit-header text-white py-8 relative">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-brain text-3xl mr-3"></i>
+                        <h1 class="text-3xl font-bold">생각이 보이는 교실</h1>
+                    </div>
+                    <p class="text-purple-100 text-lg">사고가시화 도구 툴킷 (Thinking Routines Toolkit)</p>
+                    <div class="mt-3 flex items-center gap-4">
+                        <span class="text-sm opacity-90">
+                            <i class="fas fa-book mr-1"></i> Based on "Making Thinking Visible"
+                        </span>
+                        <span class="thinking-routine-badge">Thinking Routine #1</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <a href="#" class="text-white hover:text-purple-200 transition mr-4">
+                        <i class="fab fa-github mr-1"></i> GitHub
+                    </a>
+                    <button onclick="showInfo()" class="bg-white bg-opacity-20 px-4 py-2 rounded-lg hover:bg-opacity-30 transition">
+                        <i class="fas fa-info-circle mr-1"></i> 도구 정보
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 도구 제목 섹션 -->
+    <section class="bg-white border-b">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold gradient-text mb-2">Think-Puzzle-Explore</h2>
+                    <p class="text-gray-600">알고 있는 것에서 출발하는 탐구 설계 | 사전 지식 활성화와 탐구 질문 생성</p>
+                </div>
+                <div class="flex gap-2 no-print">
+                    <button onclick="resetForm()" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition">
+                        <i class="fas fa-redo mr-1"></i> 초기화
+                    </button>
+                    <button onclick="saveProject()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                        <i class="fas fa-save mr-1"></i> 저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="container mx-auto px-6 py-8">
+        <!-- 주제 입력 영역 -->
+        <div class="glass-morphism rounded-xl p-6 mb-8 animate-in">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-bookmark mr-1"></i> 탐구 주제
+                    </label>
+                    <input 
+                        type="text" 
+                        id="topic" 
+                        placeholder="탐구하고자 하는 주제를 입력하세요"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition"
+                    >
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user-graduate mr-1"></i> 학습자
+                        </label>
+                        <input 
+                            type="text" 
+                            id="learner" 
+                            placeholder="이름 또는 학급"
+                            class="w-full px-3 py-3 border border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calendar mr-1"></i> 날짜
+                        </label>
+                        <input 
+                            type="date" 
+                            id="date" 
+                            class="w-full px-3 py-3 border border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none"
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3단계 사고 루틴 카드 -->
+        <div class="grid lg:grid-cols-3 gap-6 mb-8">
+            <!-- Think 카드 -->
+            <div class="tool-card bg-white rounded-xl shadow-lg overflow-hidden print-break relative">
+                <div class="think-gradient p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="step-indicator think-step">1</div>
+                            <div class="ml-3">
+                                <h3 class="text-xl font-bold text-orange-900">Think</h3>
+                                <p class="text-orange-700 text-sm">이미 알고 있는 것은?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <i class="fas fa-lightbulb mr-1 text-orange-500"></i>
+                            이 주제에 대해 이미 알고 있는 사실, 개념, 경험을 떠올려보세요.
+                        </p>
+                        <textarea 
+                            id="thinkInput"
+                            rows="10"
+                            placeholder="• 이미 알고 있는 사실들&#10;• 관련된 경험이나 배운 내용&#10;• 떠오르는 개념이나 아이디어&#10;• 연관된 지식이나 정보"
+                            class="w-full p-4 border-2 border-orange-200 rounded-lg focus:border-orange-400 focus:outline-none resize-none"
+                        ></textarea>
+                    </div>
+                    <div id="thinkNotes" class="space-y-2"></div>
+                    <button onclick="addNote('think')" class="text-orange-600 hover:text-orange-700 text-sm mt-2">
+                        <i class="fas fa-plus-circle mr-1"></i>메모 추가
+                    </button>
+                </div>
+                <div class="flow-connector hidden lg:block"></div>
+            </div>
+
+            <!-- Puzzle 카드 -->
+            <div class="tool-card bg-white rounded-xl shadow-lg overflow-hidden print-break relative">
+                <div class="puzzle-gradient p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="step-indicator puzzle-step">2</div>
+                            <div class="ml-3">
+                                <h3 class="text-xl font-bold text-cyan-900">Puzzle</h3>
+                                <p class="text-cyan-700 text-sm">궁금한 것은?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <i class="fas fa-question-circle mr-1 text-cyan-500"></i>
+                            이 주제에 대해 더 알고 싶은 것, 의문점, 탐구 질문을 만들어보세요.
+                        </p>
+                        <textarea 
+                            id="puzzleInput"
+                            rows="10"
+                            placeholder="• 왜 ~일까?&#10;• 어떻게 ~할 수 있을까?&#10;• 만약 ~라면 어떻게 될까?&#10;• ~와 ~의 관계는 무엇일까?&#10;• 더 알고 싶은 것은?"
+                            class="w-full p-4 border-2 border-cyan-200 rounded-lg focus:border-cyan-400 focus:outline-none resize-none"
+                        ></textarea>
+                    </div>
+                    <div id="puzzleNotes" class="space-y-2"></div>
+                    <button onclick="addNote('puzzle')" class="text-cyan-600 hover:text-cyan-700 text-sm mt-2">
+                        <i class="fas fa-plus-circle mr-1"></i>메모 추가
+                    </button>
+                </div>
+                <div class="flow-connector hidden lg:block"></div>
+            </div>
+
+            <!-- Explore 카드 -->
+            <div class="tool-card bg-white rounded-xl shadow-lg overflow-hidden print-break">
+                <div class="explore-gradient p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="step-indicator explore-step">3</div>
+                            <div class="ml-3">
+                                <h3 class="text-xl font-bold text-purple-900">Explore</h3>
+                                <p class="text-purple-700 text-sm">어떻게 알아볼까?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <i class="fas fa-search mr-1 text-purple-500"></i>
+                            궁금한 것들을 탐구하기 위한 구체적인 방법과 계획을 세워보세요.
+                        </p>
+                        <textarea 
+                            id="exploreInput"
+                            rows="10"
+                            placeholder="• 조사 방법 (책, 인터넷, 논문)&#10;• 실험이나 관찰 계획&#10;• 전문가 인터뷰&#10;• 현장 조사나 체험&#10;• 자료 수집 및 분석 방법"
+                            class="w-full p-4 border-2 border-purple-200 rounded-lg focus:border-purple-400 focus:outline-none resize-none"
+                        ></textarea>
+                    </div>
+                    <div id="exploreNotes" class="space-y-2"></div>
+                    <button onclick="addNote('explore')" class="text-purple-600 hover:text-purple-700 text-sm mt-2">
+                        <i class="fas fa-plus-circle mr-1"></i>메모 추가
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 도구 활용 팁 -->
+        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-info-circle mr-2"></i>Think-Puzzle-Explore 활용 가이드
+            </h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">
+                        <i class="fas fa-brain text-orange-500 mr-2"></i>Think 단계
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                        브레인스토밍으로 시작하세요. 작은 아이디어도 소중합니다. 
+                        사전 지식을 활성화하여 새로운 학습의 토대를 만듭니다.
+                    </p>
+                </div>
+                <div class="bg-white rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">
+                        <i class="fas fa-puzzle-piece text-cyan-500 mr-2"></i>Puzzle 단계
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                        모든 질문을 가치있게 다루세요. 호기심이 학습의 원동력입니다. 
+                        깊이 있는 탐구 질문을 만들어보세요.
+                    </p>
+                </div>
+                <div class="bg-white rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">
+                        <i class="fas fa-compass text-purple-500 mr-2"></i>Explore 단계
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                        탐구 방법을 구체적으로 계획하세요. 다양한 자료와 방법을 
+                        활용하여 깊이 있는 탐구를 설계합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="flex flex-wrap justify-center gap-3 mb-8 no-print">
+            <button onclick="downloadPDF()" class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg hover:from-indigo-600 hover:to-purple-600 transition shadow-lg">
+                <i class="fas fa-file-pdf mr-2"></i>PDF 다운로드
+            </button>
+            <button onclick="printForm()" class="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                <i class="fas fa-print mr-2"></i>인쇄하기
+            </button>
+            <button onclick="shareLink()" class="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                <i class="fas fa-share-alt mr-2"></i>공유하기
+            </button>
+            <button onclick="exportData()" class="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                <i class="fas fa-download mr-2"></i>데이터 내보내기
+            </button>
+        </div>
+
+        <!-- 저장된 프로젝트 -->
+        <div class="glass-morphism rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-folder-open mr-2"></i>저장된 탐구 프로젝트
+            </h3>
+            <div id="savedProjects" class="grid md:grid-cols-3 gap-4">
+                <!-- 저장된 프로젝트가 여기 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 정보 모달 -->
+    <div id="infoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="text-2xl font-bold gradient-text">Think-Puzzle-Explore 소개</h2>
+                <button onclick="closeInfo()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="prose max-w-none">
+                <p class="text-gray-600 mb-4">
+                    Think-Puzzle-Explore는 Harvard Project Zero에서 개발한 사고 루틴(Thinking Routine)으로, 
+                    Ron Ritchhart의 "Making Thinking Visible" 프레임워크의 핵심 도구 중 하나입니다.
+                </p>
+                <h3 class="text-lg font-semibold mb-2">사고 루틴이란?</h3>
+                <p class="text-gray-600 mb-4">
+                    사고 루틴은 학습자의 사고를 가시화하고 구조화하는 간단하면서도 강력한 도구입니다. 
+                    반복적으로 사용함으로써 깊이 있는 사고 습관을 기를 수 있습니다.
+                </p>
+                <h3 class="text-lg font-semibold mb-2">언제 사용하나요?</h3>
+                <ul class="list-disc list-inside text-gray-600 mb-4">
+                    <li>새로운 단원이나 주제를 시작할 때</li>
+                    <li>학습자의 사전 지식을 활성화하고 싶을 때</li>
+                    <li>탐구 학습을 설계할 때</li>
+                    <li>학습자 주도의 질문을 이끌어내고 싶을 때</li>
+                </ul>
+                <h3 class="text-lg font-semibold mb-2">GitHub Education</h3>
+                <p class="text-gray-600">
+                    이 도구는 교육자와 학습자를 위한 오픈소스 프로젝트입니다. 
+                    GitHub Pages를 통해 무료로 호스팅되며, 누구나 자유롭게 사용하고 개선할 수 있습니다.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // 오늘 날짜 설정
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            
+            // 저장된 데이터 불러오기
+            loadSavedData();
+            loadProjects();
+            
+            // 자동 저장 설정 (30초마다)
+            setInterval(autoSave, 30000);
+        });
+
+        // 데이터 저장
+        function saveData() {
+            const data = {
+                topic: document.getElementById('topic').value,
+                learner: document.getElementById('learner').value,
+                date: document.getElementById('date').value,
+                think: document.getElementById('thinkInput').value,
+                puzzle: document.getElementById('puzzleInput').value,
+                explore: document.getElementById('exploreInput').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('tpe_current', JSON.stringify(data));
+            return data;
+        }
+
+        // 자동 저장
+        function autoSave() {
+            if (document.getElementById('topic').value) {
+                saveData();
+                showNotification('자동 저장되었습니다');
+            }
+        }
+
+        // 프로젝트 저장
+        function saveProject() {
+            const topic = document.getElementById('topic').value;
+            if (!topic) {
+                alert('탐구 주제를 입력해주세요');
+                return;
+            }
+            
+            const data = saveData();
+            data.id = Date.now();
+            
+            let projects = JSON.parse(localStorage.getItem('tpe_projects') || '[]');
+            projects.unshift(data);
+            projects = projects.slice(0, 9); // 최대 9개
+            
+            localStorage.setItem('tpe_projects', JSON.stringify(projects));
+            loadProjects();
+            showNotification('프로젝트가 저장되었습니다');
+        }
+
+        // 저장된 데이터 불러오기
+        function loadSavedData() {
+            const saved = localStorage.getItem('tpe_current');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('topic').value = data.topic || '';
+                document.getElementById('learner').value = data.learner || '';
+                document.getElementById('date').value = data.date || '';
+                document.getElementById('thinkInput').value = data.think || '';
+                document.getElementById('puzzleInput').value = data.puzzle || '';
+                document.getElementById('exploreInput').value = data.explore || '';
+            }
+        }
+
+        // 프로젝트 목록 불러오기
+        function loadProjects() {
+            const projects = JSON.parse(localStorage.getItem('tpe_projects') || '[]');
+            const container = document.getElementById('savedProjects');
+            
+            if (projects.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center col-span-full">저장된 프로젝트가 없습니다</p>';
+                return;
+            }
+            
+            container.innerHTML = projects.map(project => `
+                <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-indigo-400 transition cursor-pointer" onclick="loadProject(${project.id})">
+                    <h4 class="font-semibold text-gray-800 mb-1 truncate">${project.topic}</h4>
+                    <p class="text-sm text-gray-600">${project.learner || '이름 없음'}</p>
+                    <p class="text-xs text-gray-500">${new Date(project.date).toLocaleDateString('ko-KR')}</p>
+                    <div class="mt-2 flex justify-between">
+                        <button onclick="event.stopPropagation(); deleteProject(${project.id})" class="text-red-500 hover:text-red-700 text-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button onclick="event.stopPropagation(); duplicateProject(${project.id})" class="text-blue-500 hover:text-blue-700 text-sm">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 프로젝트 불러오기
+        function loadProject(id) {
+            const projects = JSON.parse(localStorage.getItem('tpe_projects') || '[]');
+            const project = projects.find(p => p.id === id);
+            
+            if (project) {
+                document.getElementById('topic').value = project.topic || '';
+                document.getElementById('learner').value = project.learner || '';
+                document.getElementById('date').value = project.date || '';
+                document.getElementById('thinkInput').value = project.think || '';
+                document.getElementById('puzzleInput').value = project.puzzle || '';
+                document.getElementById('exploreInput').value = project.explore || '';
+                
+                saveData();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                showNotification('프로젝트를 불러왔습니다');
+            }
+        }
+
+        // 프로젝트 삭제
+        function deleteProject(id) {
+            if (confirm('이 프로젝트를 삭제하시겠습니까?')) {
+                let projects = JSON.parse(localStorage.getItem('tpe_projects') || '[]');
+                projects = projects.filter(p => p.id !== id);
+                localStorage.setItem('tpe_projects', JSON.stringify(projects));
+                loadProjects();
+                showNotification('프로젝트가 삭제되었습니다');
+            }
+        }
+
+        // 프로젝트 복제
+        function duplicateProject(id) {
+            const projects = JSON.parse(localStorage.getItem('tpe_projects') || '[]');
+            const project = projects.find(p => p.id === id);
+            
+            if (project) {
+                const newProject = { ...project, id: Date.now(), topic: project.topic + ' (복사본)' };
+                projects.unshift(newProject);
+                projects = projects.slice(0, 9);
+                localStorage.setItem('tpe_projects', JSON.stringify(projects));
+                loadProjects();
+                showNotification('프로젝트가 복제되었습니다');
+            }
+        }
+
+        // 메모 추가
+        function addNote(section) {
+            const text = prompt('추가할 메모를 입력하세요:');
+            if (text) {
+                const container = document.getElementById(section + 'Notes');
+                const note = document.createElement('div');
+                note.className = 'sticky-note rounded-lg';
+                note.innerHTML = `
+                    <button onclick="this.parentElement.remove()" class="float-right text-gray-500 hover:text-red-500">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <p class="text-sm pr-6">${text}</p>
+                `;
+                container.appendChild(note);
+            }
+        }
+
+        // 초기화
+        function resetForm() {
+            if (confirm('모든 내용을 초기화하시겠습니까?')) {
+                document.getElementById('topic').value = '';
+                document.getElementById('learner').value = '';
+                document.getElementById('thinkInput').value = '';
+                document.getElementById('puzzleInput').value = '';
+                document.getElementById('exploreInput').value = '';
+                
+                document.getElementById('thinkNotes').innerHTML = '';
+                document.getElementById('puzzleNotes').innerHTML = '';
+                document.getElementById('exploreNotes').innerHTML = '';
+                
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('date').value = today;
+                
+                localStorage.removeItem('tpe_current');
+                showNotification('초기화되었습니다');
+            }
+        }
+
+        // 정보 모달
+        function showInfo() {
+            document.getElementById('infoModal').classList.remove('hidden');
+        }
+
+        function closeInfo() {
+            document.getElementById('infoModal').classList.add('hidden');
+        }
+
+        // PDF 다운로드 (실제로는 인쇄 기능 사용)
+        function downloadPDF() {
+            window.print();
+        }
+
+        // 인쇄
+        function printForm() {
+            window.print();
+        }
+
+        // 공유 링크
+        function shareLink() {
+            const data = saveData();
+            const shareText = `Think-Puzzle-Explore 탐구 결과\n\n` +
+                `📚 주제: ${data.topic}\n\n` +
+                `💭 Think: ${data.think}\n\n` +
+                `❓ Puzzle: ${data.puzzle}\n\n` +
+                `🔍 Explore: ${data.explore}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Think-Puzzle-Explore: ' + data.topic,
+                    text: shareText
+                });
+            } else {
+                navigator.clipboard.writeText(shareText);
+                showNotification('클립보드에 복사되었습니다');
+            }
+        }
+
+        // 데이터 내보내기
+        function exportData() {
+            const data = saveData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `TPE_${data.topic}_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('데이터를 내보냈습니다');
+        }
+
+        // 알림 표시
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg animate-in z-50';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // 텍스트 영역 자동 저장
+        document.querySelectorAll('textarea').forEach(textarea => {
+            textarea.addEventListener('input', saveData);
+        });
+
+        // 입력 필드 자동 저장
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('change', saveData);
+        });
+    </script>
+</body>
+</html>
