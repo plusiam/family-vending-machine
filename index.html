@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>우리 가족 자판기 만들기</title>
+    <!-- html2canvas 라이브러리 복원 (이미지 캡처용) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -193,6 +195,7 @@
             width: 60%;
             text-align: center;
             position: relative;
+            color: #333;
         }
         
         .button-controls {
@@ -307,6 +310,10 @@
             color: #999;
         }
         
+        .vending-button.filled .button-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        
         .button-delete {
             position: absolute;
             top: 5px;
@@ -401,6 +408,11 @@
             color: white;
         }
         
+        .capture-button {
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+            color: white;
+        }
+        
         .action-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
@@ -419,6 +431,231 @@
         
         .saved-message.show {
             display: block;
+        }
+        
+        /* 캡처 모달 */
+        .capture-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .capture-modal.show {
+            display: flex;
+        }
+        
+        .capture-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            text-align: center;
+        }
+        
+        .capture-options {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .capture-option {
+            padding: 20px;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+        
+        .capture-option:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .capture-option h3 {
+            margin: 10px 0 5px;
+        }
+        
+        .capture-option p {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .close-modal {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        /* 로딩 스피너 */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+        }
+        
+        .loading-spinner.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 인쇄 스타일 개선 */
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            
+            body {
+                background: white !important;
+                padding: 0;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+            
+            .header {
+                color: black !important;
+                page-break-after: avoid;
+                margin-bottom: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+                color: #333 !important;
+            }
+            
+            .header p {
+                color: #666 !important;
+            }
+            
+            .actions,
+            .tabs,
+            .theme-selector,
+            .help-button,
+            .button-controls,
+            .button-delete,
+            .capture-modal,
+            .saved-message {
+                display: none !important;
+            }
+            
+            .tab-container {
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            /* 모든 탭을 한 페이지에 표시 */
+            .tab-content {
+                display: block !important;
+                page-break-inside: avoid;
+                margin-bottom: 15px;
+            }
+            
+            .vending-machine {
+                box-shadow: none;
+                border: 2px solid #333;
+                padding: 15px;
+                margin: 10px auto;
+                max-width: 45%;
+                display: inline-block;
+                vertical-align: top;
+                page-break-inside: avoid;
+            }
+            
+            .machine-header {
+                background: #f0f0f0 !important;
+                color: #333 !important;
+                padding: 10px;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .machine-header h2 {
+                font-size: 1.3em;
+                color: #333 !important;
+            }
+            
+            .machine-header input {
+                color: #333 !important;
+                font-weight: bold;
+                border: 1px solid #ddd;
+            }
+            
+            .buttons-grid {
+                min-height: auto;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            
+            .vending-button {
+                min-height: 80px;
+                padding: 8px;
+                page-break-inside: avoid;
+            }
+            
+            .vending-button.filled {
+                background: #667eea !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .button-emoji {
+                font-size: 1.5em;
+            }
+            
+            .button-input {
+                font-size: 0.8em;
+            }
+            
+            /* 2x2 그리드 레이아웃 */
+            #mom-tab .vending-machine,
+            #dad-tab .vending-machine {
+                margin-bottom: 10px;
+            }
+            
+            /* 인쇄 날짜 표시 */
+            .tab-container::after {
+                content: "인쇄일: " attr(data-date);
+                display: block;
+                text-align: center;
+                margin-top: 20px;
+                font-size: 0.9em;
+                color: #666;
+            }
         }
         
         @keyframes fadeInDown {
@@ -463,37 +700,6 @@
             }
         }
         
-        @media print {
-            body {
-                background: white;
-            }
-            
-            .container {
-                max-width: 100%;
-            }
-            
-            .header {
-                color: black;
-            }
-            
-            .actions,
-            .tabs,
-            .theme-selector,
-            .help-button {
-                display: none;
-            }
-            
-            .tab-content {
-                display: block !important;
-                page-break-after: always;
-            }
-            
-            .vending-machine {
-                box-shadow: none;
-                border: 2px solid #333;
-            }
-        }
-        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
@@ -525,7 +731,7 @@
             </div>
         </div>
         
-        <div class="tab-container">
+        <div class="tab-container" id="mainContainer">
             <button class="help-button" onclick="showHelp()" title="도움말">?</button>
             
             <div class="tabs">
@@ -537,7 +743,7 @@
             
             <!-- 엄마 자판기 -->
             <div id="mom-tab" class="tab-content active">
-                <div class="vending-machine">
+                <div class="vending-machine" id="mom-machine">
                     <div class="machine-header">
                         <h2>엄마 자판기</h2>
                         <input type="text" placeholder="엄마 이름 입력" class="name-input" data-role="mom">
@@ -553,7 +759,7 @@
             
             <!-- 아빠 자판기 -->
             <div id="dad-tab" class="tab-content">
-                <div class="vending-machine">
+                <div class="vending-machine" id="dad-machine">
                     <div class="machine-header">
                         <h2>아빠 자판기</h2>
                         <input type="text" placeholder="아빠 이름 입력" class="name-input" data-role="dad">
@@ -569,7 +775,7 @@
             
             <!-- 딸 자판기 -->
             <div id="daughter-tab" class="tab-content">
-                <div class="vending-machine">
+                <div class="vending-machine" id="daughter-machine">
                     <div class="machine-header">
                         <h2>딸 자판기</h2>
                         <input type="text" placeholder="딸 이름 입력" class="name-input" data-role="daughter">
@@ -585,7 +791,7 @@
             
             <!-- 아들 자판기 -->
             <div id="son-tab" class="tab-content">
-                <div class="vending-machine">
+                <div class="vending-machine" id="son-machine">
                     <div class="machine-header">
                         <h2>아들 자판기</h2>
                         <input type="text" placeholder="아들 이름 입력" class="name-input" data-role="son">
@@ -601,8 +807,9 @@
             
             <div class="actions">
                 <button class="action-button save-button" onclick="saveData()">💾 저장하기</button>
-                <button class="action-button export-button" onclick="exportData()">📤 내보내기</button>
-                <button class="action-button print-button" onclick="printMachines()">🖨️ 인쇄하기</button>
+                <button class="action-button capture-button" onclick="showCaptureModal()">📸 이미지 캡처</button>
+                <button class="action-button export-button" onclick="exportData()">📤 JSON 내보내기</button>
+                <button class="action-button print-button" onclick="printMachines()">🖨️ PDF 인쇄</button>
                 <button class="action-button reset-button" onclick="resetAll()">🔄 전체 초기화</button>
             </div>
             
@@ -639,6 +846,41 @@
         <span class="emoji-option">💪</span>
         <span class="emoji-option">🚀</span>
         <span class="emoji-option">🎸</span>
+    </div>
+    
+    <!-- 캡처 옵션 모달 -->
+    <div class="capture-modal" id="captureModal">
+        <div class="capture-content">
+            <h2>📸 이미지 캡처 옵션</h2>
+            <p>원하는 캡처 방식을 선택하세요</p>
+            
+            <div class="capture-options">
+                <div class="capture-option" onclick="captureCurrentTab()">
+                    <span style="font-size: 3em;">📷</span>
+                    <h3>현재 자판기</h3>
+                    <p>현재 보고 있는 자판기만 캡처</p>
+                </div>
+                
+                <div class="capture-option" onclick="captureAllMachines()">
+                    <span style="font-size: 3em;">🖼️</span>
+                    <h3>전체 자판기</h3>
+                    <p>4개 자판기 모두 한 번에 캡처</p>
+                </div>
+                
+                <div class="capture-option" onclick="captureIndividually()">
+                    <span style="font-size: 3em;">📁</span>
+                    <h3>개별 저장</h3>
+                    <p>각 자판기를 개별 파일로 저장</p>
+                </div>
+            </div>
+            
+            <button class="close-modal" onclick="closeCaptureModal()">닫기</button>
+        </div>
+    </div>
+    
+    <!-- 로딩 스피너 -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
     </div>
     
     <script>
@@ -691,8 +933,8 @@
         // 초기화
         window.addEventListener('DOMContentLoaded', function() {
             loadSavedData();
-            // 이모지 선택기 이벤트 설정
             setupEmojiPicker();
+            
             // 문서 클릭 이벤트
             document.addEventListener('click', function(e) {
                 const picker = document.getElementById('emojiPicker');
@@ -700,11 +942,14 @@
                     picker.classList.remove('show');
                 }
             });
+            
+            // 인쇄용 날짜 설정
+            const today = new Date().toLocaleDateString('ko-KR');
+            document.getElementById('mainContainer').setAttribute('data-date', today);
         });
         
         // 탭 전환
         function showTab(tabName, button) {
-            // 모든 탭 숨기기
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -712,7 +957,6 @@
                 btn.classList.remove('active');
             });
             
-            // 선택한 탭 보이기
             document.getElementById(tabName + '-tab').classList.add('active');
             button.classList.add('active');
         }
@@ -726,7 +970,6 @@
                 document.body.classList.add('pastel-theme');
             }
             
-            // 버튼 활성화 상태 변경
             document.querySelectorAll('.theme-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -750,7 +993,6 @@
                 </div>
             `;
             
-            // 버튼 클릭 이벤트
             button.addEventListener('click', function(e) {
                 if (!e.target.classList.contains('button-delete') && 
                     !e.target.classList.contains('button-emoji') &&
@@ -868,7 +1110,6 @@
             
             localStorage.setItem('familyVendingMachine', JSON.stringify(data));
             
-            // 저장 완료 메시지
             const message = document.getElementById('savedMessage');
             message.classList.add('show');
             setTimeout(() => {
@@ -883,13 +1124,11 @@
                 const data = JSON.parse(savedData);
                 ['mom', 'dad', 'daughter', 'son'].forEach(role => {
                     if (data[role]) {
-                        // 이름 설정
                         const nameInput = document.querySelector(`[data-role="${role}"]`);
                         if (nameInput && data[role].name) {
                             nameInput.value = data[role].name;
                         }
                         
-                        // 버튼 생성
                         const container = document.getElementById(role + '-buttons');
                         container.innerHTML = '';
                         buttonCounters[role] = 0;
@@ -979,9 +1218,204 @@
 4. 각 버튼에 역할이나 특징을 입력하세요
 5. 버튼을 클릭하면 색상이 변해요
 6. 💾 저장하기로 작업을 저장하세요
-7. 🖨️ 인쇄하기로 출력할 수 있어요
+7. 📸 이미지 캡처로 작품을 이미지로 저장하세요
+8. 🖨️ PDF 인쇄로 출력할 수 있어요
 
 즐거운 활동 되세요! 😊`);
+        }
+        
+        // 캡처 모달 표시
+        function showCaptureModal() {
+            document.getElementById('captureModal').classList.add('show');
+        }
+        
+        // 캡처 모달 닫기
+        function closeCaptureModal() {
+            document.getElementById('captureModal').classList.remove('show');
+        }
+        
+        // 로딩 표시
+        function showLoading() {
+            document.getElementById('loadingSpinner').classList.add('show');
+        }
+        
+        // 로딩 숨기기
+        function hideLoading() {
+            document.getElementById('loadingSpinner').classList.remove('show');
+        }
+        
+        // 현재 탭 캡처
+        async function captureCurrentTab() {
+            closeCaptureModal();
+            
+            // html2canvas 체크
+            if (typeof html2canvas === 'undefined') {
+                alert('이미지 캡처 기능을 사용할 수 없습니다. 인터넷 연결을 확인해주세요.');
+                return;
+            }
+            
+            showLoading();
+            
+            const activeTab = document.querySelector('.tab-content.active');
+            const vendingMachine = activeTab.querySelector('.vending-machine');
+            const role = activeTab.id.replace('-tab', '');
+            const name = document.querySelector(`[data-role="${role}"]`).value || role;
+            
+            try {
+                const canvas = await html2canvas(vendingMachine, {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true
+                });
+                
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${name}_자판기.png`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    hideLoading();
+                });
+            } catch (error) {
+                console.error('캡처 실패:', error);
+                alert('이미지 캡처에 실패했습니다.');
+                hideLoading();
+            }
+        }
+        
+        // 전체 자판기 캡처
+        async function captureAllMachines() {
+            closeCaptureModal();
+            
+            if (typeof html2canvas === 'undefined') {
+                alert('이미지 캡처 기능을 사용할 수 없습니다. 인터넷 연결을 확인해주세요.');
+                return;
+            }
+            
+            showLoading();
+            
+            // 임시 컨테이너 생성
+            const tempContainer = document.createElement('div');
+            tempContainer.style.cssText = 'position: absolute; left: -9999px; background: white; padding: 30px; width: 1200px;';
+            
+            // 제목 추가
+            const title = document.createElement('h1');
+            title.style.cssText = 'text-align: center; color: #333; margin-bottom: 30px;';
+            title.textContent = '우리 가족 자판기';
+            tempContainer.appendChild(title);
+            
+            // 2x2 그리드 컨테이너
+            const gridContainer = document.createElement('div');
+            gridContainer.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 20px;';
+            
+            // 각 자판기 복사
+            ['mom', 'dad', 'daughter', 'son'].forEach(role => {
+                const original = document.getElementById(`${role}-machine`);
+                const clone = original.cloneNode(true);
+                
+                // 버튼 컨트롤 제거
+                const controls = clone.querySelector('.button-controls');
+                if (controls) controls.style.display = 'none';
+                
+                // 삭제 버튼 제거
+                clone.querySelectorAll('.button-delete').forEach(btn => {
+                    btn.style.display = 'none';
+                });
+                
+                gridContainer.appendChild(clone);
+            });
+            
+            tempContainer.appendChild(gridContainer);
+            document.body.appendChild(tempContainer);
+            
+            try {
+                const canvas = await html2canvas(tempContainer, {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true
+                });
+                
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '우리가족_자판기_전체.png';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    document.body.removeChild(tempContainer);
+                    hideLoading();
+                });
+            } catch (error) {
+                console.error('전체 캡처 실패:', error);
+                alert('전체 이미지 캡처에 실패했습니다.');
+                document.body.removeChild(tempContainer);
+                hideLoading();
+            }
+        }
+        
+        // 개별 저장
+        async function captureIndividually() {
+            closeCaptureModal();
+            
+            if (typeof html2canvas === 'undefined') {
+                alert('이미지 캡처 기능을 사용할 수 없습니다. 인터넷 연결을 확인해주세요.');
+                return;
+            }
+            
+            showLoading();
+            
+            const roles = ['mom', 'dad', 'daughter', 'son'];
+            let capturedCount = 0;
+            
+            for (const role of roles) {
+                const machine = document.getElementById(`${role}-machine`);
+                const name = document.querySelector(`[data-role="${role}"]`).value || role;
+                
+                // 임시로 버튼 컨트롤 숨기기
+                const controls = machine.querySelector('.button-controls');
+                const deleteButtons = machine.querySelectorAll('.button-delete');
+                
+                if (controls) controls.style.display = 'none';
+                deleteButtons.forEach(btn => btn.style.display = 'none');
+                
+                try {
+                    const canvas = await html2canvas(machine, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,
+                        logging: false,
+                        useCORS: true
+                    });
+                    
+                    await new Promise(resolve => {
+                        canvas.toBlob(function(blob) {
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${name}_자판기.png`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            capturedCount++;
+                            
+                            // 원래대로 복구
+                            if (controls) controls.style.display = '';
+                            deleteButtons.forEach(btn => btn.style.display = '');
+                            
+                            // 다음 캡처까지 약간의 지연
+                            setTimeout(resolve, 500);
+                        });
+                    });
+                } catch (error) {
+                    console.error(`${role} 캡처 실패:`, error);
+                    if (controls) controls.style.display = '';
+                    deleteButtons.forEach(btn => btn.style.display = '');
+                }
+            }
+            
+            hideLoading();
+            alert(`${capturedCount}개의 자판기 이미지가 저장되었습니다!`);
         }
     </script>
 </body>
