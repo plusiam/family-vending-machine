@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리 가족 자판기 만들기</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .tab-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .help-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .vending-machine {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .machine-header {
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 80px;
+        }
+        
+        .machine-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .name-input {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 200px;
+            transition: all 0.3s;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .button-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .control-btn {
+            padding: 10px 20px;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            min-height: 200px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #ddd;
+        }
+        
+        .vending-button {
+            padding: 15px;
+            border: none;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .vending-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .vending-button .emoji {
+            font-size: 24px;
+        }
+        
+        .vending-button .text {
+            font-size: 12px;
+            word-break: break-word;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff4444;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            display: none;
+        }
+        
+        .vending-button:hover .delete-btn {
+            display: block;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .action-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            color: white;
+        }
+        
+        .save-button {
+            background: #4caf50;
+        }
+        
+        .capture-button {
+            background: #2196f3;
+        }
+        
+        .print-button {
+            background: #ff9800;
+        }
+        
+        .reset-button {
+            background: #f44336;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .saved-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: none;
+        }
+        
+        .emoji-picker {
+            position: fixed;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            display: none;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .emoji-option {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .emoji-option:hover {
+            background: #f0f0f0;
+            transform: scale(1.2);
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .tab-container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            .help-button,
+            .tabs,
+            .button-controls,
+            .actions,
+            .saved-message {
+                display: none !important;
+            }
+            
+            .tab-content {
+                display: block !important;
+                page-break-after: always;
+            }
+            
+            .tab-content:last-child {
+                page-break-after: auto;
+            }
+            
+            .name-input {
+                border: none;
+                background: transparent;
+                text-align: center;
+                font-weight: bold;
+            }
+            
+            .vending-machine {
+                border: 1px solid #ddd;
+            }
+            
+            .delete-btn {
+                display: none !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                justify-content: center;
+            }
+            
+            .tab-button {
+                font-size: 14px;
+                padding: 10px 16px;
+            }
+            
+            .buttons-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎰 우리 가족 자판기</h1>
+            <p>가족 구성원이 좋아하는 것들을 자판기에 담아보세요!</p>
+        </div>
+        
+        <div class="tab-container" id="mainContainer">
+            <button class="help-button" title="도움말" onclick="showHelp()">?</button>
+            
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('mom')">👩 엄마 자판기</button>
+                <button class="tab-button" onclick="switchTab('dad')">👨 아빠 자판기</button>
+                <button class="tab-button" onclick="switchTab('daughter')">👧 딸 자판기</button>
+                <button class="tab-button" onclick="switchTab('son')">👦 아들 자판기</button>
+            </div>
+            
+            <!-- 엄마 자판기 -->
+            <div id="mom-tab" class="tab-content active">
+                <div class="vending-machine" id="mom-machine">
+                    <div class="machine-header">
+                        <h2>엄마 자판기</h2>
+                        <input type="text" placeholder="엄마 이름 입력" class="name-input" data-role="mom">
+                    </div>
+                    <div class="button-controls">
+                        <button class="control-btn" onclick="addButton('mom')">➕ 버튼 추가</button>
+                        <button class="control-btn" onclick="showExample('mom')">💡 예시 보기</button>
+                        <button class="control-btn" onclick="clearButtons('mom')">🗑️ 전체 삭제</button>
+                    </div>
+                    <div class="buttons-grid" id="mom-buttons"></div>
+                </div>
+            </div>
+            
+            <!-- 아빠 자판기 -->
+            <div id="dad-tab" class="tab-content">
+                <div class="vending-machine" id="dad-machine">
+                    <div class="machine-header">
+                        <h2>아빠 자판기</h2>
+                        <input type="text" placeholder="아빠 이름 입력" class="name-input" data-role="dad">
+                    </div>
+                    <div class="button-controls">
+                        <button class="control-btn" onclick="addButton('dad')">➕ 버튼 추가</button>
+                        <button class="control-btn" onclick="showExample('dad')">💡 예시 보기</button>
+                        <button class="control-btn" onclick="clearButtons('dad')">🗑️ 전체 삭제</button>
+                    </div>
+                    <div class="buttons-grid" id="dad-buttons"></div>
+                </div>
+            </div>
+            
+            <!-- 딸 자판기 -->
+            <div id="daughter-tab" class="tab-content">
+                <div class="vending-machine" id="daughter-machine">
+                    <div class="machine-header">
+                        <h2>딸 자판기</h2>
+                        <input type="text" placeholder="딸 이름 입력" class="name-input" data-role="daughter">
+                    </div>
+                    <div class="button-controls">
+                        <button class="control-btn" onclick="addButton('daughter')">➕ 버튼 추가</button>
+                        <button class="control-btn" onclick="showExample('daughter')">💡 예시 보기</button>
+                        <button class="control-btn" onclick="clearButtons('daughter')">🗑️ 전체 삭제</button>
+                    </div>
+                    <div class="buttons-grid" id="daughter-buttons"></div>
+                </div>
+            </div>
+            
+            <!-- 아들 자판기 -->
+            <div id="son-tab" class="tab-content">
+                <div class="vending-machine" id="son-machine">
+                    <div class="machine-header">
+                        <h2>아들 자판기</h2>
+                        <input type="text" placeholder="아들 이름 입력" class="name-input" data-role="son">
+                    </div>
+                    <div class="button-controls">
+                        <button class="control-btn" onclick="addButton('son')">➕ 버튼 추가</button>
+                        <button class="control-btn" onclick="showExample('son')">💡 예시 보기</button>
+                        <button class="control-btn" onclick="clearButtons('son')">🗑️ 전체 삭제</button>
+                    </div>
+                    <div class="buttons-grid" id="son-buttons"></div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button class="action-button save-button" onclick="saveData()">💾 저장하기</button>
+                <button class="action-button capture-button" onclick="captureImage()">📸 이미지 캡처</button>
+                <button class="action-button print-button" onclick="printMachine()">🖨️ PDF 인쇄</button>
+                <button class="action-button reset-button" onclick="resetAll()">🔄 전체 초기화</button>
+            </div>
+            
+            <div class="saved-message" id="savedMessage">
+                ✅ 자판기가 저장되었습니다!
+            </div>
+        </div>
+    </div>
+    
+    <!-- 이모지 선택기 -->
+    <div class="emoji-picker" id="emojiPicker">
+        <span class="emoji-option">🍕</span>
+        <span class="emoji-option">🎮</span>
+        <span class="emoji-option">📚</span>
+        <span class="emoji-option">🎨</span>
+        <span class="emoji-option">🤗</span>
+        <span class="emoji-option">🎵</span>
+        <span class="emoji-option">🍰</span>
+        <span class="emoji-option">⚽</span>
+        <span class="emoji-option">✨</span>
+        <span class="emoji-option">🚗</span>
+        <span class="emoji-option">🎣</span>
+        <span class="emoji-option">🛠️</span>
+        <span class="emoji-option">📖</span>
+        <span class="emoji-option">🍖</span>
+        <span class="emoji-option">🏔️</span>
+        <span class="emoji-option">🎬</span>
+        <span class="emoji-option">💝</span>
+        <span class="emoji-option">🎤</span>
+        <span class="emoji-option">💃</span>
+        <span class="emoji-option">🧘</span>
+        <span class="emoji-option">🏃</span>
+        <span class="emoji-option">🌈</span>
+        <span class="emoji-option">💪</span>
+        <span class="emoji-option">🚀</span>
+        <span class="emoji-option">🎸</span>
+    </div>
+
+    <script>
+        // 전역 변수
+        let currentRole = null;
+        let currentButtonElement = null;
+        
+        // 예시 데이터
+        const examples = {
+            mom: [
+                { emoji: '🍰', text: '요리' },
+                { emoji: '💝', text: '가족시간' },
+                { emoji: '📚', text: '독서' },
+                { emoji: '🌈', text: '산책' }
+            ],
+            dad: [
+                { emoji: '🎣', text: '낚시' },
+                { emoji: '⚽', text: '운동' },
+                { emoji: '🛠️', text: '만들기' },
+                { emoji: '🚗', text: '드라이브' }
+            ],
+            daughter: [
+                { emoji: '🎨', text: '그림그리기' },
+                { emoji: '🎵', text: '노래' },
+                { emoji: '💃', text: '춤추기' },
+                { emoji: '📖', text: '동화책' }
+            ],
+            son: [
+                { emoji: '🎮', text: '게임' },
+                { emoji: '🚀', text: '우주' },
+                { emoji: '🏃', text: '달리기' },
+                { emoji: '🎸', text: '음악' }
+            ]
+        };
+        
+        // 탭 전환
+        function switchTab(role) {
+            // 모든 탭과 컨텐츠 비활성화
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 선택된 탭 활성화
+            const tabIndex = ['mom', 'dad', 'daughter', 'son'].indexOf(role);
+            if (tabIndex !== -1) {
+                document.querySelectorAll('.tab-button')[tabIndex].classList.add('active');
+                document.getElementById(`${role}-tab`).classList.add('active');
+            }
+        }
+        
+        // 버튼 추가
+        function addButton(role) {
+            currentRole = role;
+            const text = prompt('버튼 텍스트를 입력하세요:');
+            if (!text) return;
+            
+            // 이모지 선택기 표시
+            const picker = document.getElementById('emojiPicker');
+            picker.style.display = 'grid';
+            picker.style.left = '50%';
+            picker.style.top = '50%';
+            picker.style.transform = 'translate(-50%, -50%)';
+            
+            // 임시 버튼 생성
+            const tempButton = document.createElement('div');
+            tempButton.className = 'vending-button';
+            tempButton.innerHTML = `
+                <span class="emoji">😊</span>
+                <span class="text">${text}</span>
+                <button class="delete-btn" onclick="this.parentElement.remove(); saveToLocal()">×</button>
+            `;
+            
+            currentButtonElement = tempButton;
+            currentButtonElement.dataset.text = text;
+        }
+        
+        // 이모지 선택
+        document.querySelectorAll('.emoji-option').forEach(emoji => {
+            emoji.addEventListener('click', function() {
+                if (currentButtonElement && currentRole) {
+                    currentButtonElement.querySelector('.emoji').textContent = this.textContent;
+                    document.getElementById(`${currentRole}-buttons`).appendChild(currentButtonElement);
+                    document.getElementById('emojiPicker').style.display = 'none';
+                    currentButtonElement = null;
+                    currentRole = null;
+                    saveToLocal();
+                }
+            });
+        });
+        
+        // 이모지 선택기 외부 클릭 시 닫기
+        document.addEventListener('click', (e) => {
+            const picker = document.getElementById('emojiPicker');
+            if (picker.style.display === 'grid' && 
+                !e.target.closest('.emoji-picker') && 
+                !e.target.closest('.control-btn')) {
+                picker.style.display = 'none';
+                currentButtonElement = null;
+                currentRole = null;
+            }
+        });
+        
+        // ESC 키로 이모지 선택기 닫기
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('emojiPicker').style.display = 'none';
+                currentButtonElement = null;
+                currentRole = null;
+            }
+        });
+        
+        // 예시 보기
+        function showExample(role) {
+            const container = document.getElementById(`${role}-buttons`);
+            container.innerHTML = '';
+            
+            examples[role].forEach(item => {
+                const button = document.createElement('div');
+                button.className = 'vending-button';
+                button.innerHTML = `
+                    <span class="emoji">${item.emoji}</span>
+                    <span class="text">${item.text}</span>
+                    <button class="delete-btn" onclick="this.parentElement.remove(); saveToLocal()">×</button>
+                `;
+                container.appendChild(button);
+            });
+            
+            saveToLocal();
+        }
+        
+        // 버튼 전체 삭제
+        function clearButtons(role) {
+            if (confirm('정말 모든 버튼을 삭제하시겠습니까?')) {
+                document.getElementById(`${role}-buttons`).innerHTML = '';
+                saveToLocal();
+            }
+        }
+        
+        // 로컬 스토리지 저장
+        function saveToLocal() {
+            const data = {
+                mom: [],
+                dad: [],
+                daughter: [],
+                son: []
+            };
+            
+            ['mom', 'dad', 'daughter', 'son'].forEach(role => {
+                const buttons = document.querySelectorAll(`#${role}-buttons .vending-button`);
+                const nameInput = document.querySelector(`[data-role="${role}"]`);
+                
+                data[role] = {
+                    name: nameInput.value,
+                    buttons: Array.from(buttons).map(btn => ({
+                        emoji: btn.querySelector('.emoji').textContent,
+                        text: btn.querySelector('.text').textContent
+                    }))
+                };
+            });
+            
+            localStorage.setItem('familyVendingMachine', JSON.stringify(data));
+        }
+        
+        // 데이터 저장
+        function saveData() {
+            saveToLocal();
+            const message = document.getElementById('savedMessage');
+            message.style.display = 'block';
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 이미지 캡처
+        function captureImage() {
+            if (typeof html2canvas === 'undefined') {
+                alert('이미지 캡처 기능을 사용할 수 없습니다.\nPDF 인쇄 기능을 대신 사용해주세요.');
+                return;
+            }
+            
+            const activeTab = document.querySelector('.tab-content.active .vending-machine');
+            html2canvas(activeTab).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'family-vending-machine.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            }).catch(error => {
+                console.error('캡처 실패:', error);
+                alert('이미지 캡처 중 오류가 발생했습니다.');
+            });
+        }
+        
+        // 인쇄
+        function printMachine() {
+            window.print();
+        }
+        
+        // 전체 초기화
+        function resetAll() {
+            if (confirm('모든 자판기를 초기화하시겠습니까?\n저장된 데이터가 모두 삭제됩니다.')) {
+                localStorage.removeItem('familyVendingMachine');
+                location.reload();
+            }
+        }
+        
+        // 도움말
+        function showHelp() {
+            alert(`우리 가족 자판기 사용법:
+            
+1. 각 가족 구성원의 이름을 입력하세요
+2. ➕ 버튼을 눌러 좋아하는 것들을 추가하세요
+3. 💡 예시 보기로 샘플을 확인할 수 있습니다
+4. 💾 저장하기로 브라우저에 저장합니다
+5. 📸 이미지 캡처로 이미지 파일로 저장할 수 있습니다
+6. 🖨️ PDF 인쇄로 출력할 수 있습니다
+            
+가족과 함께 즐거운 시간 보내세요! 😊`);
+        }
+        
+        // 페이지 로드 시 저장된 데이터 불러오기
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('familyVendingMachine');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                ['mom', 'dad', 'daughter', 'son'].forEach(role => {
+                    if (data[role]) {
+                        // 이름 복원
+                        const nameInput = document.querySelector(`[data-role="${role}"]`);
+                        if (data[role].name) {
+                            nameInput.value = data[role].name;
+                        }
+                        
+                        // 버튼 복원
+                        const container = document.getElementById(`${role}-buttons`);
+                        if (data[role].buttons) {
+                            data[role].buttons.forEach(item => {
+                                const button = document.createElement('div');
+                                button.className = 'vending-button';
+                                button.innerHTML = `
+                                    <span class="emoji">${item.emoji}</span>
+                                    <span class="text">${item.text}</span>
+                                    <button class="delete-btn" onclick="this.parentElement.remove(); saveToLocal()">×</button>
+                                `;
+                                container.appendChild(button);
+                            });
+                        }
+                    }
+                });
+            }
+        });
+        
+        // 페이지 나가기 전 저장 확인
+        window.addEventListener('beforeunload', (e) => {
+            const buttons = document.querySelectorAll('.vending-button');
+            if (buttons.length > 0) {
+                saveToLocal();
+            }
+        });
+    </script>
+</body>
+</html>
