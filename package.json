@@ -1,17 +1,16 @@
 {
   "name": "family-vending-machine",
   "version": "2.0.0",
-  "description": "우리 가족 자판기 만들기 - 《엄마 자판기》 그림책 연계 교육 활동",
+  "description": "《엄마 자판기》 그림책 연계 교육 활동 웹 애플리케이션",
   "main": "index.html",
   "scripts": {
-    "start": "npx http-server -p 8080",
-    "dev": "npx http-server -p 8080 -o",
+    "start": "python -m http.server 8000 || npx http-server",
+    "dev": "npx live-server",
     "lint": "eslint js/*.js",
     "lint:fix": "eslint js/*.js --fix",
-    "format": "prettier --write '**/*.{js,css,html,json,md}'",
+    "format": "prettier --write '**/*.{js,css,html,json}'",
     "test": "echo \"No tests specified\" && exit 0",
-    "build": "npm run lint && npm run format",
-    "serve": "npx serve",
+    "build": "echo \"No build process required\" && exit 0",
     "deploy": "gh-pages -d ."
   },
   "repository": {
@@ -22,30 +21,24 @@
     "education",
     "family",
     "vending-machine",
-    "korean",
-    "javascript",
-    "pwa",
-    "web-app",
     "kids",
-    "interactive",
-    "educational-tool"
+    "PWA",
+    "javascript",
+    "html5",
+    "css3"
   ],
-  "author": {
-    "name": "룰루랄라 한기쌤",
-    "email": "yeohanki@naver.com",
-    "url": "https://github.com/plusiam"
-  },
+  "author": "룰루랄라 한기쌤 <yeohanki@naver.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/plusiam/family-vending-machine/issues"
   },
   "homepage": "https://plusiam.github.io/family-vending-machine/",
   "devDependencies": {
-    "eslint": "^8.50.0",
-    "prettier": "^3.0.3",
+    "eslint": "^8.56.0",
+    "gh-pages": "^6.1.1",
     "http-server": "^14.1.1",
-    "serve": "^14.2.1",
-    "gh-pages": "^6.0.0"
+    "live-server": "^1.2.2",
+    "prettier": "^3.2.4"
   },
   "eslintConfig": {
     "env": {
@@ -54,7 +47,7 @@
     },
     "extends": "eslint:recommended",
     "parserOptions": {
-      "ecmaVersion": "latest",
+      "ecmaVersion": 12,
       "sourceType": "module"
     },
     "rules": {
@@ -63,37 +56,19 @@
       "semi": ["error", "always"],
       "no-unused-vars": "warn",
       "no-console": "off"
-    },
-    "globals": {
-      "CONFIG": "readonly",
-      "VendingMachine": "readonly",
-      "StorageManager": "readonly",
-      "CaptureManager": "readonly",
-      "ShareManager": "readonly",
-      "I18n": "readonly",
-      "html2canvas": "readonly",
-      "QRCode": "readonly",
-      "Kakao": "readonly"
     }
   },
   "prettier": {
     "semi": true,
     "singleQuote": true,
     "tabWidth": 4,
-    "useTabs": false,
-    "trailingComma": "es5",
+    "printWidth": 100,
     "bracketSpacing": true,
-    "arrowParens": "avoid",
-    "printWidth": 100
+    "arrowParens": "avoid"
   },
   "browserslist": [
-    "last 2 versions",
     "> 1%",
-    "not dead",
-    "not ie <= 11"
-  ],
-  "engines": {
-    "node": ">=14.0.0",
-    "npm": ">=6.0.0"
-  }
+    "last 2 versions",
+    "not dead"
+  ]
 }
