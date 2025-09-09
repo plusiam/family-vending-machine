@@ -114,7 +114,7 @@
             background: linear-gradient(145deg, #e6e6e6, #ffffff);
             border-radius: 20px;
             padding: 30px;
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
             box-shadow: 
                 inset 0 2px 4px rgba(0,0,0,0.1),
@@ -181,38 +181,69 @@
             transform: translateY(-2px);
         }
         
-        .buttons-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-            min-height: 200px;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            border: 2px dashed #ddd;
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
-        @media (max-width: 480px) {
+        /* 4x2 그리드 레이아웃 */
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+            min-height: 320px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            border: 3px solid #e0e0e0;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        /* 모바일 반응형 */
+        @media (max-width: 600px) {
             .buttons-grid {
                 grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+                min-height: 400px;
             }
+        }
+        
+        /* 빈 슬롯 스타일 */
+        .empty-slot {
+            background: linear-gradient(145deg, #f8f8f8, #ffffff);
+            border: 2px dashed #d0d0d0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+            aspect-ratio: 1/1.2;
+            opacity: 0.5;
+        }
+        
+        .empty-slot span {
+            color: #c0c0c0;
+            font-size: 3em;
         }
         
         /* 빈 버튼 스타일 */
         .empty-button {
             background: linear-gradient(145deg, #f0f0f0, #ffffff);
             border: 2px solid #e0e0e0;
-            border-radius: 15px;
-            padding: 20px 10px;
+            border-radius: 12px;
+            padding: 15px 8px;
             min-height: 140px;
+            aspect-ratio: 1/1.2;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            position: relative;
         }
         
         .empty-button:hover {
@@ -226,24 +257,24 @@
             top: 8px;
             right: 8px;
             background: rgba(0,0,0,0.1);
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.85em;
+            font-size: 0.8em;
+            color: #666;
         }
         
         .button-emoji {
-            font-size: 2.5em;
+            font-size: 2.2em;
             display: block;
             text-align: center;
             cursor: pointer;
             transition: transform 0.3s ease;
             line-height: 1;
-            margin-top: 5px;
         }
         
         .button-emoji:hover {
@@ -251,15 +282,15 @@
         }
         
         .button-input {
-            width: 100%;
+            width: 90%;
             border: none;
             background: transparent;
             text-align: center;
-            font-size: 0.95em;
+            font-size: 0.9em;
             color: inherit;
             outline: none;
             font-weight: 500;
-            padding: 5px;
+            padding: 4px;
         }
         
         .button-input::placeholder {
@@ -271,9 +302,10 @@
             background: linear-gradient(145deg, #667eea, #764ba2);
             color: white;
             border: 2px solid transparent;
-            border-radius: 15px;
-            padding: 20px 10px;
+            border-radius: 12px;
+            padding: 15px 8px;
             min-height: 140px;
+            aspect-ratio: 1/1.2;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
@@ -281,7 +313,22 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            animation: popIn 0.4s ease;
+        }
+        
+        @keyframes popIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
         
         .vending-button:hover {
@@ -290,29 +337,30 @@
         }
         
         .vending-button .emoji {
-            font-size: 2.5em;
+            font-size: 2.2em;
             line-height: 1;
         }
         
         .vending-button .text {
-            font-size: 1em;
+            font-size: 0.95em;
             font-weight: 500;
             word-break: keep-all;
             text-align: center;
+            max-width: 90%;
         }
         
         .button-delete {
             position: absolute;
-            top: 8px;
-            left: 8px;
-            width: 22px;
-            height: 22px;
+            top: 5px;
+            left: 5px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: rgba(244, 67, 54, 0.9);
             color: white;
             border: none;
             cursor: pointer;
-            font-size: 0.75em;
+            font-size: 0.7em;
             display: none;
             align-items: center;
             justify-content: center;
@@ -321,6 +369,15 @@
         
         .vending-button:hover .button-delete {
             display: flex;
+        }
+        
+        /* 버튼 개수 표시 */
+        .button-count {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: -10px;
+            margin-bottom: 10px;
         }
         
         .emoji-picker {
@@ -469,7 +526,8 @@
             .button-controls,
             .actions,
             .saved-message,
-            .button-delete {
+            .button-delete,
+            .button-count {
                 display: none !important;
             }
             
@@ -544,6 +602,7 @@
                         <button class="control-btn" onclick="showSample('mom')">💡 예시 보기</button>
                         <button class="control-btn" onclick="clearButtons('mom')">🗑️ 전체 삭제</button>
                     </div>
+                    <div class="button-count" id="mom-count">0/8 버튼</div>
                     <div class="buttons-grid" id="mom-buttons"></div>
                 </div>
             </div>
@@ -563,6 +622,7 @@
                         <button class="control-btn" onclick="showSample('dad')">💡 예시 보기</button>
                         <button class="control-btn" onclick="clearButtons('dad')">🗑️ 전체 삭제</button>
                     </div>
+                    <div class="button-count" id="dad-count">0/8 버튼</div>
                     <div class="buttons-grid" id="dad-buttons"></div>
                 </div>
             </div>
@@ -582,6 +642,7 @@
                         <button class="control-btn" onclick="showSample('daughter')">💡 예시 보기</button>
                         <button class="control-btn" onclick="clearButtons('daughter')">🗑️ 전체 삭제</button>
                     </div>
+                    <div class="button-count" id="daughter-count">0/8 버튼</div>
                     <div class="buttons-grid" id="daughter-buttons"></div>
                 </div>
             </div>
@@ -601,6 +662,7 @@
                         <button class="control-btn" onclick="showSample('son')">💡 예시 보기</button>
                         <button class="control-btn" onclick="clearButtons('son')">🗑️ 전체 삭제</button>
                     </div>
+                    <div class="button-count" id="son-count">0/8 버튼</div>
                     <div class="buttons-grid" id="son-buttons"></div>
                 </div>
             </div>
@@ -657,6 +719,7 @@
         };
         
         let currentEmojiButton = null;
+        const MAX_BUTTONS = 8; // 최대 버튼 개수
         
         // 예시 데이터
         const samples = {
@@ -666,7 +729,9 @@
                 { emoji: '📚', text: '독서' },
                 { emoji: '🌈', text: '산책' },
                 { emoji: '☕', text: '커피' },
-                { emoji: '🎨', text: '그림' }
+                { emoji: '🎨', text: '그림' },
+                { emoji: '🧘', text: '요가' },
+                { emoji: '🌸', text: '꽃꽂이' }
             ],
             dad: [
                 { emoji: '🎣', text: '낚시' },
@@ -674,7 +739,9 @@
                 { emoji: '🛠️', text: '만들기' },
                 { emoji: '🚗', text: '드라이브' },
                 { emoji: '📰', text: '뉴스' },
-                { emoji: '🏔️', text: '등산' }
+                { emoji: '🏔️', text: '등산' },
+                { emoji: '🎸', text: '기타' },
+                { emoji: '📺', text: 'TV시청' }
             ],
             daughter: [
                 { emoji: '🎨', text: '그림그리기' },
@@ -682,17 +749,55 @@
                 { emoji: '💃', text: '춤추기' },
                 { emoji: '📖', text: '동화책' },
                 { emoji: '🦄', text: '유니콘' },
-                { emoji: '🌸', text: '꽃' }
+                { emoji: '🌸', text: '꽃' },
+                { emoji: '🍭', text: '사탕' },
+                { emoji: '🎀', text: '리본' }
             ],
             son: [
                 { emoji: '🎮', text: '게임' },
                 { emoji: '🚀', text: '우주' },
                 { emoji: '🏃', text: '달리기' },
-                { emoji: '🎸', text: '음악' },
+                { emoji: '⚽', text: '축구' },
                 { emoji: '🦖', text: '공룡' },
-                { emoji: '⚡', text: '번개' }
+                { emoji: '🚗', text: '자동차' },
+                { emoji: '🤖', text: '로봇' },
+                { emoji: '🦸', text: '히어로' }
             ]
         };
+        
+        // 초기화 - 빈 슬롯 표시
+        function initializeGrid(role) {
+            const container = document.getElementById(`${role}-buttons`);
+            container.innerHTML = '';
+            
+            // 8개의 빈 슬롯 생성
+            for (let i = 0; i < MAX_BUTTONS; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'empty-slot';
+                slot.innerHTML = '<span>○</span>';
+                container.appendChild(slot);
+            }
+            
+            updateButtonCount(role);
+        }
+        
+        // 버튼 개수 업데이트
+        function updateButtonCount(role) {
+            const buttons = document.querySelectorAll(`#${role}-buttons .vending-button`);
+            const count = buttons.length;
+            const countElement = document.getElementById(`${role}-count`);
+            countElement.textContent = `${count}/${MAX_BUTTONS} 버튼`;
+            
+            // 버튼 추가 버튼 활성화/비활성화
+            const addButton = document.querySelector(`#${role}-tab .control-btn`);
+            if (count >= MAX_BUTTONS) {
+                addButton.disabled = true;
+                addButton.textContent = '➕ 최대 개수';
+            } else {
+                addButton.disabled = false;
+                addButton.textContent = '➕ 버튼 추가';
+            }
+        }
         
         // 탭 전환
         function showTab(role, button) {
@@ -712,20 +817,33 @@
         // 빈 버튼 추가
         function addEmptyButton(role) {
             const container = document.getElementById(`${role}-buttons`);
+            const currentButtons = container.querySelectorAll('.vending-button').length;
+            
+            if (currentButtons >= MAX_BUTTONS) {
+                alert(`최대 ${MAX_BUTTONS}개까지만 추가할 수 있습니다!`);
+                return;
+            }
+            
             const buttonId = `${role}-button-${buttonCounters[role]++}`;
             
-            const button = document.createElement('div');
-            button.className = 'empty-button';
-            button.id = buttonId;
-            button.style.position = 'relative';
-            button.innerHTML = `
-                <span class="button-number">${buttonCounters[role] - 1}</span>
-                <span class="button-emoji" onclick="selectEmoji('${buttonId}')">➕</span>
-                <input type="text" class="button-input" placeholder="텍스트 입력" onchange="saveToLocal()">
-            `;
-            
-            container.appendChild(button);
-            saveToLocal();
+            // 첫 번째 빈 슬롯 찾기
+            const emptySlot = container.querySelector('.empty-slot');
+            if (emptySlot) {
+                const button = document.createElement('div');
+                button.className = 'empty-button';
+                button.id = buttonId;
+                button.style.position = 'relative';
+                button.innerHTML = `
+                    <span class="button-number">${currentButtons + 1}</span>
+                    <span class="button-emoji" onclick="selectEmoji('${buttonId}')">➕</span>
+                    <input type="text" class="button-input" placeholder="텍스트 입력" onchange="saveToLocal()">
+                `;
+                
+                // 빈 슬롯을 버튼으로 교체
+                container.replaceChild(button, emptySlot);
+                updateButtonCount(role);
+                saveToLocal();
+            }
         }
         
         // 이모지 선택
@@ -747,6 +865,7 @@
                 if (currentEmojiButton) {
                     const emojiSpan = currentEmojiButton.querySelector('.button-emoji');
                     const textInput = currentEmojiButton.querySelector('.button-input');
+                    const role = currentEmojiButton.id.split('-')[0];
                     
                     emojiSpan.textContent = this.textContent;
                     
@@ -759,16 +878,17 @@
                         deleteBtn.className = 'button-delete';
                         deleteBtn.textContent = '×';
                         deleteBtn.onclick = function() {
-                            currentEmojiButton.remove();
-                            saveToLocal();
+                            deleteButton(currentEmojiButton);
                         };
                         currentEmojiButton.appendChild(deleteBtn);
                     }
                     
                     // 구조 재정리
                     const text = textInput.value || '텍스트 입력';
+                    const buttonNumber = currentEmojiButton.querySelector('.button-number').textContent;
                     currentEmojiButton.innerHTML = `
-                        <button class="button-delete" onclick="this.parentElement.remove(); saveToLocal()">×</button>
+                        <span class="button-number">${buttonNumber}</span>
+                        <button class="button-delete" onclick="deleteButton(this.parentElement)">×</button>
                         <span class="emoji">${this.textContent}</span>
                         <span class="text">${text}</span>
                     `;
@@ -779,6 +899,31 @@
                 }
             });
         });
+        
+        // 버튼 삭제
+        function deleteButton(button) {
+            const role = button.id.split('-')[0];
+            const container = document.getElementById(`${role}-buttons`);
+            
+            // 버튼을 빈 슬롯으로 교체
+            const emptySlot = document.createElement('div');
+            emptySlot.className = 'empty-slot';
+            emptySlot.innerHTML = '<span>○</span>';
+            
+            container.replaceChild(emptySlot, button);
+            
+            // 버튼 번호 재정렬
+            const buttons = container.querySelectorAll('.vending-button, .empty-button');
+            buttons.forEach((btn, index) => {
+                const numberSpan = btn.querySelector('.button-number');
+                if (numberSpan) {
+                    numberSpan.textContent = index + 1;
+                }
+            });
+            
+            updateButtonCount(role);
+            saveToLocal();
+        }
         
         // 이모지 선택기 외부 클릭 시 닫기
         document.addEventListener('click', (e) => {
@@ -795,25 +940,37 @@
             container.innerHTML = '';
             buttonCounters[role] = 1;
             
-            samples[role].forEach(item => {
+            // 예시 버튼 추가
+            samples[role].forEach((item, index) => {
                 const button = document.createElement('div');
                 button.className = 'vending-button';
+                button.id = `${role}-button-${index + 1}`;
                 button.innerHTML = `
-                    <button class="button-delete" onclick="this.parentElement.remove(); saveToLocal()">×</button>
+                    <span class="button-number">${index + 1}</span>
+                    <button class="button-delete" onclick="deleteButton(this.parentElement)">×</button>
                     <span class="emoji">${item.emoji}</span>
                     <span class="text">${item.text}</span>
                 `;
                 container.appendChild(button);
-                buttonCounters[role]++;
             });
             
+            // 나머지 빈 슬롯 채우기
+            for (let i = samples[role].length; i < MAX_BUTTONS; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'empty-slot';
+                slot.innerHTML = '<span>○</span>';
+                container.appendChild(slot);
+            }
+            
+            buttonCounters[role] = samples[role].length + 1;
+            updateButtonCount(role);
             saveToLocal();
         }
         
         // 버튼 전체 삭제
         function clearButtons(role) {
             if (confirm('정말 모든 버튼을 삭제하시겠습니까?')) {
-                document.getElementById(`${role}-buttons`).innerHTML = '';
+                initializeGrid(role);
                 buttonCounters[role] = 1;
                 saveToLocal();
             }
@@ -891,7 +1048,7 @@
             alert(`우리 가족 자판기 사용법:
             
 1. 각 가족 구성원의 이름을 입력하세요
-2. ➕ 버튼 추가를 눌러 빈 버튼을 추가하세요
+2. ➕ 버튼 추가를 눌러 빈 버튼을 추가하세요 (최대 8개)
 3. ➕ 아이콘을 클릭하여 이모지를 선택하세요
 4. 텍스트를 입력하세요
 5. 💡 예시 보기로 샘플을 확인할 수 있습니다
@@ -902,8 +1059,14 @@
 가족과 함께 즐거운 시간 보내세요! 😊`);
         }
         
-        // 페이지 로드 시 저장된 데이터 불러오기
+        // 페이지 로드 시 초기화 및 저장된 데이터 불러오기
         window.addEventListener('load', () => {
+            // 모든 그리드 초기화
+            ['mom', 'dad', 'daughter', 'son'].forEach(role => {
+                initializeGrid(role);
+            });
+            
+            // 저장된 데이터 불러오기
             const saved = localStorage.getItem('familyVendingMachine');
             if (saved) {
                 const data = JSON.parse(saved);
@@ -918,17 +1081,32 @@
                         
                         // 버튼 복원
                         const container = document.getElementById(`${role}-buttons`);
-                        if (data[role].buttons) {
-                            data[role].buttons.forEach(item => {
+                        if (data[role].buttons && data[role].buttons.length > 0) {
+                            container.innerHTML = '';
+                            
+                            // 저장된 버튼 복원
+                            data[role].buttons.forEach((item, index) => {
                                 const button = document.createElement('div');
                                 button.className = 'vending-button';
+                                button.id = `${role}-button-${index + 1}`;
                                 button.innerHTML = `
-                                    <button class="button-delete" onclick="this.parentElement.remove(); saveToLocal()">×</button>
+                                    <span class="button-number">${index + 1}</span>
+                                    <button class="button-delete" onclick="deleteButton(this.parentElement)">×</button>
                                     <span class="emoji">${item.emoji}</span>
                                     <span class="text">${item.text}</span>
                                 `;
                                 container.appendChild(button);
                             });
+                            
+                            // 나머지 빈 슬롯 채우기
+                            for (let i = data[role].buttons.length; i < MAX_BUTTONS; i++) {
+                                const slot = document.createElement('div');
+                                slot.className = 'empty-slot';
+                                slot.innerHTML = '<span>○</span>';
+                                container.appendChild(slot);
+                            }
+                            
+                            updateButtonCount(role);
                         }
                     }
                 });
