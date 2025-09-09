@@ -187,19 +187,23 @@ class VendingMachineAppClass {
     }
     
     /**
-     * 버튼 추가
+     * 버튼 추가 - 바로 빈 버튼 생성
      * @param {string} role - 역할 ID
      */
     addButton(role) {
         const machine = this.machines[role];
         if (!machine) return;
         
-        const text = prompt('버튼 텍스트를 입력하세요:');
-        if (!text) return;
-        
-        const button = machine.addButton({ text });
+        // 빈 버튼을 바로 추가 (텍스트 없이)
+        const button = machine.addButton({ text: '' });
         if (button) {
-            this.showEmojiPicker(button.id);
+            // 버튼이 렌더링된 후 입력 필드에 포커스
+            setTimeout(() => {
+                const buttonElement = document.querySelector(`[data-button-id="${button.id}"] .button-input`);
+                if (buttonElement) {
+                    buttonElement.focus();
+                }
+            }, 100);
         }
     }
     
@@ -273,7 +277,7 @@ class VendingMachineAppClass {
     showEmojiPicker(buttonId) {
         this.currentEmojiButton = buttonId;
         
-        const buttonElement = document.querySelector(`[data-button-id="${buttonId}"]`);
+        const buttonElement = document.querySelector(`[data-button-id="${buttonId}"] .button-emoji`);
         if (!buttonElement) return;
         
         const rect = buttonElement.getBoundingClientRect();
