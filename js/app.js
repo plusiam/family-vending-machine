@@ -11,6 +11,7 @@ class VendingMachineAppClass {
         this.emojiPicker = null;
         this.currentEmojiButton = null;
         this.isInitialized = false;
+        this.selectedEmoji = null;
     }
     
     /**
@@ -86,7 +87,7 @@ class VendingMachineAppClass {
             // 버튼 추가
             const addBtn = container.querySelector('.add-button');
             if (addBtn) {
-                addBtn.addEventListener('click', () => this.addButton(role.id));
+                addBtn.addEventListener('click', () => this.showEmojiSelector(role.id));
             }
             
             // 예시 보기
@@ -187,17 +188,162 @@ class VendingMachineAppClass {
     }
     
     /**
-     * 버튼 추가 - 바로 빈 버튼 생성
+     * 이모지 선택기 표시 (역할별 이모지)
      * @param {string} role - 역할 ID
      */
-    addButton(role) {
+    showEmojiSelector(role) {
         const machine = this.machines[role];
         if (!machine) return;
         
-        // 빈 버튼을 바로 추가 (텍스트 없이)
-        const button = machine.addButton({ text: '' });
+        // 역할별 이모지 배열 가져오기
+        const emojis = this.config.roleEmojis[role] || this.config.emojis;
+        
+        // 이모지 선택 모달 생성
+        this.createEmojiSelectorModal(role, emojis);
+    }
+    
+    /**
+     * 이모지 선택 모달 생성
+     * @param {string} role - 역할 ID
+     * @param {Array} emojis - 이모지 배열
+     */
+    createEmojiSelectorModal(role, emojis) {
+        // 기존 모달 제거
+        const existingModal = document.getElementById('emojiSelectorModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // 모달 생성
+        const modal = document.createElement('div');
+        modal.id = 'emojiSelectorModal';
+        modal.className = 'emoji-selector-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        `;
+        
+        const content = document.createElement('div');
+        content.className = 'emoji-selector-content';
+        content.style.cssText = `
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        `;
+        
+        // 타이틀
+        const title = document.createElement('h2');
+        const roleLabel = this.config.roles.find(r => r.id === role)?.label || role;
+        title.textContent = `${roleLabel} 자판기 버튼 만들기`;
+        title.style.cssText = 'text-align: center; margin-bottom: 10px; color: #333;';
+        
+        const subtitle = document.createElement('p');
+        subtitle.textContent = '좋아하는 것을 나타내는 이모지를 선택하세요!';
+        subtitle.style.cssText = 'text-align: center; margin-bottom: 30px; color: #666;';
+        
+        // 이모지 그리드
+        const grid = document.createElement('div');
+        grid.className = 'emoji-selector-grid';
+        grid.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        `;
+        
+        // 이모지 버튼 생성
+        emojis.forEach(emoji => {
+            const emojiBtn = document.createElement('button');
+            emojiBtn.className = 'emoji-selector-button';
+            emojiBtn.textContent = emoji;
+            emojiBtn.style.cssText = `
+                font-size: 2em;
+                padding: 15px;
+                border: 2px solid #ddd;
+                border-radius: 15px;
+                background: white;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            `;
+            
+            emojiBtn.addEventListener('mouseenter', () => {
+                emojiBtn.style.transform = 'scale(1.2)';
+                emojiBtn.style.borderColor = '#667eea';
+                emojiBtn.style.background = '#f0f4ff';
+            });
+            
+            emojiBtn.addEventListener('mouseleave', () => {
+                emojiBtn.style.transform = 'scale(1)';
+                emojiBtn.style.borderColor = '#ddd';
+                emojiBtn.style.background = 'white';
+            });
+            
+            emojiBtn.addEventListener('click', () => {
+                this.addButtonWithEmoji(role, emoji);
+                modal.remove();
+            });
+            
+            grid.appendChild(emojiBtn);
+        });
+        
+        // 닫기 버튼
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '취소';
+        closeBtn.style.cssText = `
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            display: block;
+            margin: 20px auto 0;
+        `;
+        closeBtn.addEventListener('click', () => modal.remove());
+        
+        // 조립
+        content.appendChild(title);
+        content.appendChild(subtitle);
+        content.appendChild(grid);
+        content.appendChild(closeBtn);
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+        
+        // 모달 외부 클릭 시 닫기
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+    
+    /**
+     * 선택한 이모지로 버튼 추가
+     * @param {string} role - 역할 ID
+     * @param {string} emoji - 선택한 이모지
+     */
+    addButtonWithEmoji(role, emoji) {
+        const machine = this.machines[role];
+        if (!machine) return;
+        
+        // 선택한 이모지로 버튼 생성
+        const button = machine.addButton({ emoji: emoji, text: '' });
         if (button) {
-            // 버튼이 렌더링된 후 입력 필드에 포커스
+            // 입력 필드에 포커스
             setTimeout(() => {
                 const buttonElement = document.querySelector(`[data-button-id="${button.id}"] .button-input`);
                 if (buttonElement) {
@@ -230,7 +376,7 @@ class VendingMachineAppClass {
     }
     
     /**
-     * 이모지 피커 초기화
+     * 이모지 피커 초기화 (버튼 수정용)
      */
     initEmojiPicker() {
         this.emojiPicker = document.getElementById('emojiPicker');
@@ -247,27 +393,35 @@ class VendingMachineAppClass {
     }
     
     /**
-     * 이모지 피커 생성
+     * 이모지 피커 생성 (버튼 수정용)
      */
     createEmojiPicker() {
         const picker = document.createElement('div');
         picker.id = 'emojiPicker';
         picker.className = 'emoji-picker';
         
-        this.config.emojis.forEach(emoji => {
-            const option = document.createElement('span');
-            option.className = 'emoji-option';
-            option.textContent = emoji;
-            option.addEventListener('click', () => {
-                if (this.currentEmojiButton) {
-                    this.selectEmojiValue(this.currentEmojiButton, emoji);
-                }
+        // 현재 역할의 이모지 사용
+        const updatePickerEmojis = () => {
+            const emojis = this.config.roleEmojis[this.currentRole] || this.config.emojis;
+            picker.innerHTML = '';
+            
+            emojis.forEach(emoji => {
+                const option = document.createElement('span');
+                option.className = 'emoji-option';
+                option.textContent = emoji;
+                option.addEventListener('click', () => {
+                    if (this.currentEmojiButton) {
+                        this.selectEmojiValue(this.currentEmojiButton, emoji);
+                    }
+                });
+                picker.appendChild(option);
             });
-            picker.appendChild(option);
-        });
+        };
         
+        updatePickerEmojis();
         document.body.appendChild(picker);
         this.emojiPicker = picker;
+        this.updatePickerEmojis = updatePickerEmojis;
     }
     
     /**
@@ -276,6 +430,11 @@ class VendingMachineAppClass {
      */
     showEmojiPicker(buttonId) {
         this.currentEmojiButton = buttonId;
+        
+        // 현재 역할에 맞는 이모지로 업데이트
+        if (this.updatePickerEmojis) {
+            this.updatePickerEmojis();
+        }
         
         const buttonElement = document.querySelector(`[data-button-id="${buttonId}"] .button-emoji`);
         if (!buttonElement) return;
@@ -558,6 +717,12 @@ ESC: 모달 닫기
     closeAllModals() {
         this.hideEmojiPicker();
         this.captureManager.closeCaptureModal();
+        
+        // 이모지 선택 모달 닫기
+        const emojiModal = document.getElementById('emojiSelectorModal');
+        if (emojiModal) {
+            emojiModal.remove();
+        }
     }
     
     /**
