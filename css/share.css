@@ -1,0 +1,407 @@
+/* ================================
+   우리 가족 자판기 - 공유 스타일
+   ================================ */
+
+/* 공유 모달 */
+.share-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.share-modal.show {
+    display: flex;
+}
+
+.share-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    text-align: center;
+    animation: slideInUp 0.3s ease;
+}
+
+.share-content h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.share-content > p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* 공유 탭 */
+.share-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.share-tab {
+    padding: 10px 20px;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.share-tab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.share-tab.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+/* 탭 콘텐츠 */
+.share-tab-content {
+    display: none;
+}
+
+.share-tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* QR 코드 컨테이너 */
+.qr-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: white;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    min-height: 280px;
+}
+
+.qr-container canvas {
+    border: 4px solid #667eea;
+    border-radius: 10px;
+    padding: 10px;
+    background: white;
+}
+
+/* QR 코드 다운로드 버튼 */
+.download-qr-btn {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.download-qr-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* URL 컨테이너 */
+.url-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.share-url-input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    font-size: 0.9em;
+    color: #333;
+    outline: none;
+}
+
+.copy-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.copy-btn:hover {
+    transform: scale(1.05);
+}
+
+/* 공유 옵션 */
+.share-options {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: #667eea;
+}
+
+.share-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+/* 닫기 버튼 */
+.close-modal {
+    margin-top: 20px;
+    padding: 10px 30px;
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+}
+
+/* 언어 선택기 */
+.language-selector {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    gap: 5px;
+    background: white;
+    padding: 5px;
+    border-radius: 25px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.lang-btn {
+    padding: 8px 15px;
+    border: none;
+    background: transparent;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.lang-btn:hover {
+    background: #f0f0f0;
+}
+
+.lang-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+/* 토스트 메시지 */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    z-index: 10000;
+    animation: slideInUp 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.toast.success {
+    background: #4CAF50;
+}
+
+.toast.error {
+    background: #f44336;
+}
+
+.toast.warning {
+    background: #ff9800;
+}
+
+/* 접근성 - ARIA 레이블 */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* 키보드 포커스 스타일 */
+*:focus {
+    outline: 3px solid #667eea;
+    outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+*:focus-visible {
+    outline: 3px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .share-content {
+        padding: 20px;
+    }
+    
+    .share-tabs {
+        flex-direction: column;
+    }
+    
+    .share-tab {
+        width: 100%;
+    }
+    
+    .share-options {
+        flex-direction: column;
+    }
+    
+    .share-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .url-container {
+        flex-direction: column;
+    }
+    
+    .copy-btn {
+        width: 100%;
+    }
+    
+    .language-selector {
+        top: auto;
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* 다크 테마 지원 */
+.dark-theme .share-content {
+    background: #2c2c2c;
+    color: #f0f0f0;
+}
+
+.dark-theme .share-content h2 {
+    color: #f0f0f0;
+}
+
+.dark-theme .share-content > p {
+    color: #aaa;
+}
+
+.dark-theme .share-tab {
+    background: #3a3a3a;
+    color: #f0f0f0;
+}
+
+.dark-theme .url-container {
+    background: #3a3a3a;
+}
+
+.dark-theme .share-url-input {
+    color: #f0f0f0;
+}
+
+.dark-theme .share-btn {
+    background: #3a3a3a;
+    border-color: #5a5a5a;
+    color: #f0f0f0;
+}
+
+.dark-theme .qr-container {
+    background: #3a3a3a;
+}
+
+.dark-theme .language-selector {
+    background: #3a3a3a;
+}
+
+.dark-theme .lang-btn:hover {
+    background: #4a4a4a;
+}
