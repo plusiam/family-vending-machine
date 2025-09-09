@@ -1,0 +1,280 @@
+/* ================================
+   우리 가족 자판기 - 테마 스타일
+   ================================ */
+
+/* 라이트 테마 (기본) */
+body.light-theme {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.light-theme .tab-container {
+    background: white;
+    color: #333;
+}
+
+.light-theme .vending-machine {
+    background: linear-gradient(145deg, #e6e6e6, #ffffff);
+}
+
+.light-theme .control-btn {
+    background: white;
+    color: #667eea;
+    border-color: #667eea;
+}
+
+.light-theme .control-btn:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* 다크 테마 */
+body.dark-theme {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.dark-theme .tab-container {
+    background: #2c2c2c;
+    color: #f0f0f0;
+}
+
+.dark-theme .machine-header {
+    background: linear-gradient(135deg, #4a4a4a, #2c2c2c);
+}
+
+.dark-theme .vending-machine {
+    background: linear-gradient(145deg, #3a3a3a, #2c2c2c);
+}
+
+.dark-theme .tab-button {
+    background: #4a4a4a;
+    color: #f0f0f0;
+}
+
+.dark-theme .tab-button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.dark-theme .control-btn {
+    background: #3a3a3a;
+    color: #f0f0f0;
+    border-color: #667eea;
+}
+
+.dark-theme .control-btn:hover {
+    background: #667eea;
+    color: white;
+}
+
+.dark-theme .vending-button {
+    background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+    border-color: #5a5a5a;
+    color: #f0f0f0;
+}
+
+.dark-theme .vending-button.filled {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.dark-theme .name-input {
+    background: rgba(255,255,255,0.1);
+    color: #f0f0f0;
+    border-color: #667eea;
+}
+
+.dark-theme .name-input::placeholder {
+    color: rgba(240,240,240,0.5);
+}
+
+.dark-theme .buttons-grid {
+    background: #2c2c2c;
+    border-color: #4a4a4a;
+}
+
+/* 파스텔 테마 */
+body.pastel-theme {
+    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+}
+
+.pastel-theme .tab-container {
+    background: #fef9f3;
+    color: #5a5a5a;
+}
+
+.pastel-theme .machine-header {
+    background: linear-gradient(135deg, #ffd89b, #19547b);
+}
+
+.pastel-theme .vending-machine {
+    background: linear-gradient(145deg, #fff5f5, #ffe0e0);
+}
+
+.pastel-theme .tab-button {
+    background: #ffe0e0;
+    color: #5a5a5a;
+}
+
+.pastel-theme .tab-button.active {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+}
+
+.pastel-theme .control-btn {
+    background: #fff5f5;
+    color: #fa709a;
+    border-color: #fa709a;
+}
+
+.pastel-theme .control-btn:hover {
+    background: #fa709a;
+    color: white;
+}
+
+.pastel-theme .vending-button {
+    background: linear-gradient(145deg, #fff5f5, #ffe0e0);
+    border-color: #ffc0c0;
+}
+
+.pastel-theme .vending-button.filled {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+}
+
+.pastel-theme .buttons-grid {
+    background: #fff9f9;
+    border-color: #ffc0c0;
+}
+
+/* 키즈 테마 */
+body.kids-theme {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    position: relative;
+}
+
+.kids-theme::before {
+    content: "";
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255,255,255,0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.kids-theme .tab-container {
+    background: linear-gradient(145deg, #ffffff, #fff9e6);
+    border: 3px solid #ffeb3b;
+    box-shadow: 0 0 30px rgba(255,235,59,0.3);
+}
+
+.kids-theme .machine-header {
+    background: linear-gradient(135deg, #ff6b9d, #feca57);
+    border: 2px solid #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.kids-theme .tab-button {
+    background: linear-gradient(145deg, #ffeb3b, #ffc107);
+    color: #333;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+}
+
+.kids-theme .tab-button.active {
+    background: linear-gradient(135deg, #ff6b9d, #c44569);
+    color: white;
+    transform: scale(1.1);
+}
+
+.kids-theme .vending-button {
+    background: linear-gradient(145deg, #fff9c4, #ffeb3b);
+    border: 3px solid #ffc107;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.kids-theme .vending-button:hover {
+    animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0) scale(1.05); }
+    50% { transform: translateY(-10px) scale(1.05); }
+}
+
+.kids-theme .button-emoji {
+    animation: wiggle 2s ease infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+}
+
+/* 테마 선택 버튼 스타일 */
+.theme-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.theme-btn {
+    padding: 8px 15px;
+    border: 2px solid white;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+}
+
+.theme-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+}
+
+.theme-btn.active {
+    background: white;
+    color: #333;
+}
+
+/* 다크 테마 특별 효과 */
+.dark-theme .theme-btn {
+    border-color: #667eea;
+    background: rgba(102,126,234,0.2);
+}
+
+.dark-theme .theme-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+/* 파스텔 테마 특별 효과 */
+.pastel-theme .theme-btn {
+    border-color: #fa709a;
+    background: rgba(250,112,154,0.2);
+    color: #5a5a5a;
+}
+
+.pastel-theme .theme-btn.active {
+    background: #fa709a;
+    color: white;
+}
+
+/* 테마 전환 애니메이션 */
+body {
+    transition: background 0.5s ease;
+}
+
+.tab-container,
+.vending-machine,
+.tab-button,
+.control-btn,
+.vending-button,
+.buttons-grid {
+    transition: all 0.3s ease;
+}
