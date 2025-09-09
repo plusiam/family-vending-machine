@@ -181,6 +181,7 @@
             margin-bottom: 25px;
             position: relative;
             z-index: 5;
+            min-height: 80px;
         }
         
         .machine-header h2 {
@@ -189,18 +190,80 @@
             position: relative;
         }
         
-        .machine-header input {
-            background: rgba(255,255,255,0.95);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 1.1em;
+        .name-input-wrapper {
+            position: relative;
+            display: inline-block;
             width: 70%;
             max-width: 300px;
+        }
+        
+        .machine-header input {
+            background: rgba(255,255,255,0.95);
+            border: 2px solid transparent;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            width: 100%;
             text-align: center;
             position: relative;
             color: #333;
             z-index: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .machine-header input.error {
+            border-color: #ff4444;
+            background: rgba(255,200,200,0.95);
+        }
+        
+        .char-counter {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.75em;
+            color: #666;
+            pointer-events: none;
+            background: white;
+            padding: 2px 5px;
+            border-radius: 10px;
+        }
+        
+        .char-counter.warning {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        
+        .char-counter.error {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        
+        .input-warning {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 5px;
+            background: #ff4444;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            display: none;
+            z-index: 10;
+        }
+        
+        .input-warning.show {
+            display: block;
+            animation: shake 0.3s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(-50%) translateX(0); }
+            25% { transform: translateX(-50%) translateX(-5px); }
+            75% { transform: translateX(-50%) translateX(5px); }
         }
         
         .button-controls {
@@ -546,6 +609,84 @@
             animation: spin 1s linear infinite;
         }
         
+        /* 인쇄 전용 스타일 */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0;
+            }
+            
+            .header,
+            .theme-selector,
+            .help-button,
+            .button-controls,
+            .actions,
+            .saved-message,
+            .button-delete,
+            .char-counter,
+            .input-warning {
+                display: none !important;
+            }
+            
+            .tab-container {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+            
+            .machine-header {
+                background: #FF6B6B !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .machine-header input {
+                border: none;
+                background: transparent;
+                color: white !important;
+                font-weight: bold;
+                max-width: 200px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-size: 1rem;
+            }
+            
+            /* 긴 텍스트 처리 */
+            .machine-header input[data-print-mode="compressed"] {
+                font-size: 0.85rem;
+                letter-spacing: -0.5px;
+            }
+            
+            .machine-header input[data-print-mode="very-compressed"] {
+                font-size: 0.75rem;
+                letter-spacing: -1px;
+            }
+            
+            .vending-button {
+                page-break-inside: avoid;
+            }
+            
+            .vending-button.filled {
+                background: #667eea !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .buttons-grid {
+                page-break-inside: avoid;
+            }
+            
+            /* 각 탭을 별도 페이지로 */
+            .tab-content {
+                page-break-after: always;
+            }
+            
+            .tab-content:last-child {
+                page-break-after: auto;
+            }
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -674,7 +815,15 @@
                 <div class="vending-machine" id="mom-machine">
                     <div class="machine-header">
                         <h2>엄마 자판기</h2>
-                        <input type="text" placeholder="엄마 이름 입력" class="name-input" data-role="mom">
+                        <div class="name-input-wrapper">
+                            <input type="text" 
+                                   placeholder="이름 입력 (최대 20자)" 
+                                   class="name-input" 
+                                   data-role="mom" 
+                                   maxlength="20">
+                            <span class="char-counter">0/20</span>
+                            <div class="input-warning">이름이 너무 깁니다!</div>
+                        </div>
                     </div>
                     <div class="button-controls">
                         <button class="control-btn" onclick="addButton('mom')">➕ 버튼 추가</button>
@@ -690,7 +839,15 @@
                 <div class="vending-machine" id="dad-machine">
                     <div class="machine-header">
                         <h2>아빠 자판기</h2>
-                        <input type="text" placeholder="아빠 이름 입력" class="name-input" data-role="dad">
+                        <div class="name-input-wrapper">
+                            <input type="text" 
+                                   placeholder="이름 입력 (최대 20자)" 
+                                   class="name-input" 
+                                   data-role="dad" 
+                                   maxlength="20">
+                            <span class="char-counter">0/20</span>
+                            <div class="input-warning">이름이 너무 깁니다!</div>
+                        </div>
                     </div>
                     <div class="button-controls">
                         <button class="control-btn" onclick="addButton('dad')">➕ 버튼 추가</button>
@@ -706,7 +863,15 @@
                 <div class="vending-machine" id="daughter-machine">
                     <div class="machine-header">
                         <h2>딸 자판기</h2>
-                        <input type="text" placeholder="딸 이름 입력" class="name-input" data-role="daughter">
+                        <div class="name-input-wrapper">
+                            <input type="text" 
+                                   placeholder="이름 입력 (최대 20자)" 
+                                   class="name-input" 
+                                   data-role="daughter" 
+                                   maxlength="20">
+                            <span class="char-counter">0/20</span>
+                            <div class="input-warning">이름이 너무 깁니다!</div>
+                        </div>
                     </div>
                     <div class="button-controls">
                         <button class="control-btn" onclick="addButton('daughter')">➕ 버튼 추가</button>
@@ -722,7 +887,15 @@
                 <div class="vending-machine" id="son-machine">
                     <div class="machine-header">
                         <h2>아들 자판기</h2>
-                        <input type="text" placeholder="아들 이름 입력" class="name-input" data-role="son">
+                        <div class="name-input-wrapper">
+                            <input type="text" 
+                                   placeholder="이름 입력 (최대 20자)" 
+                                   class="name-input" 
+                                   data-role="son" 
+                                   maxlength="20">
+                            <span class="char-counter">0/20</span>
+                            <div class="input-warning">이름이 너무 깁니다!</div>
+                        </div>
                     </div>
                     <div class="button-controls">
                         <button class="control-btn" onclick="addButton('son')">➕ 버튼 추가</button>
@@ -821,499 +994,48 @@
         
         let currentEmojiButton = null;
         
-        // 샘플 데이터
-        const sampleData = {
-            mom: [
-                {emoji: '🍕', label: '피자 만들어주는 엄마'},
-                {emoji: '🎮', label: '같이 놀아주는 엄마'},
-                {emoji: '📚', label: '책 읽어주는 엄마'},
-                {emoji: '🤗', label: '안아주는 엄마'},
-                {emoji: '🎵', label: '노래하는 엄마'},
-                {emoji: '🍰', label: '맛있는 요리 엄마'}
-            ],
-            dad: [
-                {emoji: '🚗', label: '드라이브 아빠'},
-                {emoji: '⚽', label: '축구하는 아빠'},
-                {emoji: '🎣', label: '낚시 가는 아빠'},
-                {emoji: '🛠️', label: '뭐든 고치는 아빠'},
-                {emoji: '📖', label: '이야기 들려주는 아빠'},
-                {emoji: '🍖', label: '고기 구워주는 아빠'}
-            ],
-            daughter: [
-                {emoji: '💝', label: '사랑스러운 딸'},
-                {emoji: '🎤', label: '노래 잘하는 딸'},
-                {emoji: '💃', label: '춤추는 딸'},
-                {emoji: '📚', label: '공부 열심히 하는 딸'},
-                {emoji: '🎨', label: '그림 그리는 딸'},
-                {emoji: '🌈', label: '밝고 명랑한 딸'}
-            ],
-            son: [
-                {emoji: '💪', label: '힘센 아들'},
-                {emoji: '🎮', label: '게임 좋아하는 아들'},
-                {emoji: '⚽', label: '축구 잘하는 아들'},
-                {emoji: '🚀', label: '모험 좋아하는 아들'},
-                {emoji: '🤗', label: '다정한 아들'},
-                {emoji: '📚', label: '똑똑한 아들'}
-            ]
-        };
-        
-        // 초기화
-        window.addEventListener('DOMContentLoaded', function() {
-            loadSavedData();
-            setupEmojiPicker();
-            
-            // 문서 클릭 이벤트
-            document.addEventListener('click', function(e) {
-                const picker = document.getElementById('emojiPicker');
-                if (!picker.contains(e.target) && !e.target.classList.contains('button-emoji')) {
-                    picker.classList.remove('show');
-                }
-            });
-            
-            // 인쇄용 날짜 설정
-            const today = new Date().toLocaleDateString('ko-KR');
-            document.getElementById('mainContainer').setAttribute('data-date', today);
-        });
-        
-        // 탭 전환
-        function showTab(tabName, button) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            document.getElementById(tabName + '-tab').classList.add('active');
-            button.classList.add('active');
-        }
-        
-        // 테마 변경
-        function changeTheme(theme, button) {
-            document.body.className = '';
-            if (theme === 'dark') {
-                document.body.classList.add('dark-theme');
-            } else if (theme === 'pastel') {
-                document.body.classList.add('pastel-theme');
+        // 이름 입력 검증 클래스
+        class NameInputValidator {
+            constructor(inputElement) {
+                this.input = inputElement;
+                this.wrapper = inputElement.parentElement;
+                this.counter = this.wrapper.querySelector('.char-counter');
+                this.warning = this.wrapper.querySelector('.input-warning');
+                this.maxLength = 20;
+                this.init();
             }
             
-            document.querySelectorAll('.theme-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            button.classList.add('active');
-        }
-        
-        // 버튼 추가
-        function addButton(role) {
-            const container = document.getElementById(role + '-buttons');
-            buttonCounters[role]++;
-            
-            const button = document.createElement('div');
-            button.className = 'vending-button';
-            
-            button.innerHTML = `
-                <button class="button-delete" onclick="deleteButton(this, event)">✕</button>
-                <span class="button-number">${buttonCounters[role]}</span>
-                <span class="button-emoji" onclick="showEmojiPicker(this, event)">🎯</span>
-                <div class="button-label">
-                    <input type="text" class="button-input" placeholder="역할 입력" maxlength="15">
-                </div>
-            `;
-            
-            button.addEventListener('click', function(e) {
-                if (!e.target.classList.contains('button-delete') && 
-                    !e.target.classList.contains('button-emoji') &&
-                    !e.target.classList.contains('button-input')) {
-                    this.classList.toggle('filled');
-                }
-            });
-            
-            container.appendChild(button);
-        }
-        
-        // 버튼 삭제
-        function deleteButton(btn, event) {
-            event.stopPropagation();
-            if (confirm('이 버튼을 삭제하시겠습니까?')) {
-                btn.parentElement.remove();
-                updateButtonNumbers();
-            }
-        }
-        
-        // 버튼 번호 업데이트
-        function updateButtonNumbers() {
-            const activeTab = document.querySelector('.tab-content.active');
-            const buttons = activeTab.querySelectorAll('.vending-button');
-            buttons.forEach((button, index) => {
-                button.querySelector('.button-number').textContent = index + 1;
-            });
-        }
-        
-        // 이모지 선택기 표시
-        function showEmojiPicker(emojiElement, event) {
-            event.stopPropagation();
-            currentEmojiButton = emojiElement;
-            
-            const picker = document.getElementById('emojiPicker');
-            const rect = emojiElement.getBoundingClientRect();
-            
-            picker.style.left = Math.min(rect.left, window.innerWidth - 270) + 'px';
-            picker.style.top = (rect.bottom + 5) + 'px';
-            picker.classList.add('show');
-        }
-        
-        // 이모지 선택기 설정
-        function setupEmojiPicker() {
-            const picker = document.getElementById('emojiPicker');
-            picker.querySelectorAll('.emoji-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    if (currentEmojiButton) {
-                        currentEmojiButton.textContent = this.textContent;
-                        picker.classList.remove('show');
-                    }
-                });
-            });
-        }
-        
-        // 예시 보기
-        function showSample(role) {
-            const samples = sampleData[role];
-            if (confirm('예시 버튼들을 추가하시겠습니까? (기존 버튼은 유지됩니다)')) {
-                samples.forEach(sample => {
-                    const container = document.getElementById(role + '-buttons');
-                    buttonCounters[role]++;
-                    
-                    const button = document.createElement('div');
-                    button.className = 'vending-button';
-                    
-                    button.innerHTML = `
-                        <button class="button-delete" onclick="deleteButton(this, event)">✕</button>
-                        <span class="button-number">${buttonCounters[role]}</span>
-                        <span class="button-emoji" onclick="showEmojiPicker(this, event)">${sample.emoji}</span>
-                        <div class="button-label">
-                            <input type="text" class="button-input" value="${sample.label}" maxlength="15">
-                        </div>
-                    `;
-                    
-                    button.addEventListener('click', function(e) {
-                        if (!e.target.classList.contains('button-delete') && 
-                            !e.target.classList.contains('button-emoji') &&
-                            !e.target.classList.contains('button-input')) {
-                            this.classList.toggle('filled');
-                        }
-                    });
-                    
-                    container.appendChild(button);
-                });
-            }
-        }
-        
-        // 버튼 전체 삭제
-        function clearButtons(role) {
-            if (confirm('모든 버튼을 삭제하시겠습니까?')) {
-                document.getElementById(role + '-buttons').innerHTML = '';
-                buttonCounters[role] = 0;
-            }
-        }
-        
-        // 데이터 저장
-        function saveData() {
-            const data = {};
-            ['mom', 'dad', 'daughter', 'son'].forEach(role => {
-                const buttons = [];
-                const container = document.getElementById(role + '-buttons');
-                container.querySelectorAll('.vending-button').forEach(button => {
-                    buttons.push({
-                        emoji: button.querySelector('.button-emoji').textContent,
-                        label: button.querySelector('.button-input').value,
-                        filled: button.classList.contains('filled')
-                    });
-                });
-                data[role] = {
-                    name: document.querySelector(`[data-role="${role}"]`).value,
-                    buttons: buttons
-                };
-            });
-            
-            localStorage.setItem('familyVendingMachine', JSON.stringify(data));
-            
-            const message = document.getElementById('savedMessage');
-            message.classList.add('show');
-            setTimeout(() => {
-                message.classList.remove('show');
-            }, 3000);
-        }
-        
-        // 저장된 데이터 불러오기
-        function loadSavedData() {
-            const savedData = localStorage.getItem('familyVendingMachine');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                ['mom', 'dad', 'daughter', 'son'].forEach(role => {
-                    if (data[role]) {
-                        const nameInput = document.querySelector(`[data-role="${role}"]`);
-                        if (nameInput && data[role].name) {
-                            nameInput.value = data[role].name;
-                        }
-                        
-                        const container = document.getElementById(role + '-buttons');
-                        container.innerHTML = '';
-                        buttonCounters[role] = 0;
-                        
-                        data[role].buttons.forEach(buttonData => {
-                            buttonCounters[role]++;
-                            const button = document.createElement('div');
-                            button.className = 'vending-button';
-                            if (buttonData.filled) {
-                                button.classList.add('filled');
-                            }
-                            
-                            button.innerHTML = `
-                                <button class="button-delete" onclick="deleteButton(this, event)">✕</button>
-                                <span class="button-number">${buttonCounters[role]}</span>
-                                <span class="button-emoji" onclick="showEmojiPicker(this, event)">${buttonData.emoji}</span>
-                                <div class="button-label">
-                                    <input type="text" class="button-input" value="${buttonData.label}" maxlength="15">
-                                </div>
-                            `;
-                            
-                            button.addEventListener('click', function(e) {
-                                if (!e.target.classList.contains('button-delete') && 
-                                    !e.target.classList.contains('button-emoji') &&
-                                    !e.target.classList.contains('button-input')) {
-                                    this.classList.toggle('filled');
-                                }
-                            });
-                            
-                            container.appendChild(button);
-                        });
-                    }
-                });
-            }
-        }
-        
-        // 인쇄
-        function printMachines() {
-            window.print();
-        }
-        
-        // 전체 초기화
-        function resetAll() {
-            if (confirm('모든 데이터를 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-                localStorage.removeItem('familyVendingMachine');
-                location.reload();
-            }
-        }
-        
-        // 도움말
-        function showHelp() {
-            alert(`🎯 사용 방법:
-            
-1. 각 가족 구성원의 이름을 입력하세요
-2. ➕ 버튼으로 원하는 만큼 버튼을 추가하세요
-3. 이모지를 클릭해서 변경할 수 있어요
-4. 각 버튼에 역할이나 특징을 입력하세요
-5. 버튼을 클릭하면 색상이 변해요
-6. 💾 저장하기로 작업을 저장하세요
-7. 📸 이미지 캡처로 작품을 이미지로 저장하세요
-8. 🖨️ PDF 인쇄로 출력할 수 있어요
-
-즐거운 활동 되세요! 😊`);
-        }
-        
-        // 캡처 모달 표시
-        function showCaptureModal() {
-            document.getElementById('captureModal').classList.add('show');
-        }
-        
-        // 캡처 모달 닫기
-        function closeCaptureModal() {
-            document.getElementById('captureModal').classList.remove('show');
-        }
-        
-        // 로딩 표시
-        function showLoading() {
-            document.getElementById('loadingSpinner').classList.add('show');
-        }
-        
-        // 로딩 숨기기
-        function hideLoading() {
-            document.getElementById('loadingSpinner').classList.remove('show');
-        }
-        
-        // 현재 탭 캡처
-        async function captureCurrentTab() {
-            closeCaptureModal();
-            
-            // html2canvas 체크
-            if (typeof html2canvas === 'undefined') {
-                alert('이미지 캡처 기능을 사용할 수 없습니다. 인터넷 연결을 확인해주세요.');
-                return;
-            }
-            
-            showLoading();
-            
-            const activeTab = document.querySelector('.tab-content.active');
-            const vendingMachine = activeTab.querySelector('.vending-machine');
-            const role = activeTab.id.replace('-tab', '');
-            const name = document.querySelector(`[data-role="${role}"]`).value || role;
-            
-            try {
-                const canvas = await html2canvas(vendingMachine, {
-                    backgroundColor: '#ffffff',
-                    scale: 2,
-                    logging: false,
-                    useCORS: true
+            init() {
+                this.input.addEventListener('input', () => {
+                    this.validate();
+                    this.updateCounter();
+                    this.adjustPrintStyle();
                 });
                 
-                canvas.toBlob(function(blob) {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${name}_자판기.png`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    hideLoading();
-                });
-            } catch (error) {
-                console.error('캡처 실패:', error);
-                alert('이미지 캡처에 실패했습니다.');
-                hideLoading();
-            }
-        }
-        
-        // 전체 자판기 캡처
-        async function captureAllMachines() {
-            closeCaptureModal();
-            
-            if (typeof html2canvas === 'undefined') {
-                alert('이미지 캡처 기능을 사용할 수 없습니다. 인터넷 연결을 확인해주세요.');
-                return;
+                // 초기 상태 설정
+                this.updateCounter();
             }
             
-            showLoading();
-            
-            // 임시 컨테이너 생성
-            const tempContainer = document.createElement('div');
-            tempContainer.style.cssText = 'position: absolute; left: -9999px; background: white; padding: 30px; width: 1200px;';
-            
-            // 제목 추가
-            const title = document.createElement('h1');
-            title.style.cssText = 'text-align: center; color: #333; margin-bottom: 30px;';
-            title.textContent = '우리 가족 자판기';
-            tempContainer.appendChild(title);
-            
-            // 2x2 그리드 컨테이너
-            const gridContainer = document.createElement('div');
-            gridContainer.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 20px;';
-            
-            // 각 자판기 복사
-            ['mom', 'dad', 'daughter', 'son'].forEach(role => {
-                const original = document.getElementById(`${role}-machine`);
-                const clone = original.cloneNode(true);
+            validate() {
+                const length = this.input.value.length;
                 
-                // 버튼 컨트롤 제거
-                const controls = clone.querySelector('.button-controls');
-                if (controls) controls.style.display = 'none';
-                
-                // 삭제 버튼 제거
-                clone.querySelectorAll('.button-delete').forEach(btn => {
-                    btn.style.display = 'none';
-                });
-                
-                gridContainer.appendChild(clone);
-            });
-            
-            tempContainer.appendChild(gridContainer);
-            document.body.appendChild(tempContainer);
-            
-            try {
-                const canvas = await html2canvas(tempContainer, {
-                    backgroundColor: '#ffffff',
-                    scale: 2,
-                    logging: false,
-                    useCORS: true
-                });
-                
-                canvas.toBlob(function(blob) {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = '우리가족_자판기_전체.png';
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    document.body.removeChild(tempContainer);
-                    hideLoading();
-                });
-            } catch (error) {
-                console.error('전체 캡처 실패:', error);
-                alert('전체 이미지 캡처에 실패했습니다.');
-                document.body.removeChild(tempContainer);
-                hideLoading();
-            }
-        }
-        
-        // 개별 저장
-        async function captureIndividually() {
-            closeCaptureModal();
-            
-            if (typeof html2canvas === 'undefined') {
-                alert('이미지 캡처 기능을 사용할 수 없습니다. 인터넷 연결을 확인해주세요.');
-                return;
-            }
-            
-            showLoading();
-            
-            const roles = ['mom', 'dad', 'daughter', 'son'];
-            let capturedCount = 0;
-            
-            for (const role of roles) {
-                const machine = document.getElementById(`${role}-machine`);
-                const name = document.querySelector(`[data-role="${role}"]`).value || role;
-                
-                // 임시로 버튼 컨트롤 숨기기
-                const controls = machine.querySelector('.button-controls');
-                const deleteButtons = machine.querySelectorAll('.button-delete');
-                
-                if (controls) controls.style.display = 'none';
-                deleteButtons.forEach(btn => btn.style.display = 'none');
-                
-                try {
-                    const canvas = await html2canvas(machine, {
-                        backgroundColor: '#ffffff',
-                        scale: 2,
-                        logging: false,
-                        useCORS: true
-                    });
-                    
-                    await new Promise(resolve => {
-                        canvas.toBlob(function(blob) {
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${name}_자판기.png`;
-                            a.click();
-                            URL.revokeObjectURL(url);
-                            capturedCount++;
-                            
-                            // 원래대로 복구
-                            if (controls) controls.style.display = '';
-                            deleteButtons.forEach(btn => btn.style.display = '');
-                            
-                            // 다음 캡처까지 약간의 지연
-                            setTimeout(resolve, 500);
-                        });
-                    });
-                } catch (error) {
-                    console.error(`${role} 캡처 실패:`, error);
-                    if (controls) controls.style.display = '';
-                    deleteButtons.forEach(btn => btn.style.display = '');
+                if (length >= this.maxLength) {
+                    this.input.classList.add('error');
+                    this.warning.classList.add('show');
+                    this.counter.classList.add('error');
+                    this.counter.classList.remove('warning');
+                } else if (length >= 15) {
+                    this.input.classList.remove('error');
+                    this.warning.classList.remove('show');
+                    this.counter.classList.add('warning');
+                    this.counter.classList.remove('error');
+                } else {
+                    this.input.classList.remove('error');
+                    this.warning.classList.remove('show');
+                    this.counter.classList.remove('warning', 'error');
                 }
             }
             
-            hideLoading();
-            alert(`${capturedCount}개의 자판기 이미지가 저장되었습니다!`);
-        }
-    </script>
-</body>
-</html>
+            updateCounter() {
+                const length = this.input.value.length;
+                this.counter.textContent = `${length}/${this.max
