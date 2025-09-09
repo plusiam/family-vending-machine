@@ -3,7 +3,7 @@
  * @module App
  */
 
-class VendingMachineApp {
+class VendingMachineAppClass {
     constructor() {
         this.machines = {};
         this.currentTheme = 'light';
@@ -234,15 +234,6 @@ class VendingMachineApp {
             this.createEmojiPicker();
         }
         
-        // 이모지 선택 이벤트
-        document.querySelectorAll('.emoji-option').forEach(emoji => {
-            emoji.addEventListener('click', (e) => {
-                if (this.currentEmojiButton) {
-                    this.selectEmoji(this.currentEmojiButton, e.target.textContent);
-                }
-            });
-        });
-        
         // 외부 클릭 시 닫기
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.emoji-picker') && !e.target.closest('.button-emoji')) {
@@ -263,6 +254,11 @@ class VendingMachineApp {
             const option = document.createElement('span');
             option.className = 'emoji-option';
             option.textContent = emoji;
+            option.addEventListener('click', () => {
+                if (this.currentEmojiButton) {
+                    this.selectEmojiValue(this.currentEmojiButton, emoji);
+                }
+            });
             picker.appendChild(option);
         });
         
@@ -306,11 +302,19 @@ class VendingMachineApp {
     }
     
     /**
-     * 이모지 선택
+     * 이모지 선택 (HTML onclick용)
+     * @param {string} buttonId - 버튼 ID
+     */
+    selectEmoji(buttonId) {
+        this.showEmojiPicker(buttonId);
+    }
+    
+    /**
+     * 이모지 값 선택
      * @param {string} buttonId - 버튼 ID
      * @param {string} emoji - 이모지
      */
-    selectEmoji(buttonId, emoji) {
+    selectEmojiValue(buttonId, emoji) {
         // 버튼이 속한 자판기 찾기
         for (const role in this.machines) {
             const machine = this.machines[role];
@@ -578,7 +582,7 @@ ESC: 모달 닫기
 }
 
 // 전역 인스턴스 생성
-const VendingMachineApp = new VendingMachineApp();
+const VendingMachineApp = new VendingMachineAppClass();
 
 // DOM 로드 완료 시 초기화
 if (document.readyState === 'loading') {

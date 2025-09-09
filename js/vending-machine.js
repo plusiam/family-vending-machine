@@ -132,17 +132,44 @@ class VendingMachine {
         buttonElement.className = 'vending-button filled';
         buttonElement.dataset.buttonId = button.id;
         
-        buttonElement.innerHTML = `
-            <span class="button-number">${button.order}</span>
-            <span class="button-emoji" onclick="VendingMachineApp.selectEmoji('${button.id}')">${button.emoji}</span>
-            <input type="text" 
-                   class="button-input" 
-                   placeholder="텍스트 입력" 
-                   value="${button.text}"
-                   maxlength="${this.config.button.maxTextLength}"
-                   onchange="VendingMachineApp.updateButtonText('${button.id}', this.value)">
-            <button class="button-delete" onclick="VendingMachineApp.deleteButton('${button.id}')">×</button>
-        `;
+        // 버튼 번호
+        const buttonNumber = document.createElement('span');
+        buttonNumber.className = 'button-number';
+        buttonNumber.textContent = button.order;
+        
+        // 이모지 버튼
+        const buttonEmoji = document.createElement('span');
+        buttonEmoji.className = 'button-emoji';
+        buttonEmoji.textContent = button.emoji;
+        buttonEmoji.style.cursor = 'pointer';
+        buttonEmoji.addEventListener('click', () => {
+            window.VendingMachineApp.selectEmoji(button.id);
+        });
+        
+        // 텍스트 입력
+        const buttonInput = document.createElement('input');
+        buttonInput.type = 'text';
+        buttonInput.className = 'button-input';
+        buttonInput.placeholder = '텍스트 입력';
+        buttonInput.value = button.text;
+        buttonInput.maxLength = this.config.button.maxTextLength;
+        buttonInput.addEventListener('change', (e) => {
+            window.VendingMachineApp.updateButtonText(button.id, e.target.value);
+        });
+        
+        // 삭제 버튼
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'button-delete';
+        deleteButton.textContent = '×';
+        deleteButton.addEventListener('click', () => {
+            window.VendingMachineApp.deleteButton(button.id);
+        });
+        
+        // 버튼 요소들 추가
+        buttonElement.appendChild(buttonNumber);
+        buttonElement.appendChild(buttonEmoji);
+        buttonElement.appendChild(buttonInput);
+        buttonElement.appendChild(deleteButton);
         
         buttonsGrid.appendChild(buttonElement);
         
@@ -205,13 +232,33 @@ class VendingMachine {
             }
         }
         
+        // 남은 버튼들의 순서 업데이트
+        this.updateButtonOrders();
         this.autoSave();
+    }
+    
+    /**
+     * 버튼 순서 업데이트
+     */
+    updateButtonOrders() {
+        const buttonElements = this.container.querySelectorAll('.vending-button');
+        buttonElements.forEach((element, index) => {
+            const numberSpan = element.querySelector('.button-number');
+            if (numberSpan) {
+                numberSpan.textContent = index + 1;
+            }
+        });
     }
     
     /**
      * 모든 버튼 삭제
      */
     clearAllButtons() {
+        if (this.buttons.length === 0) {
+            this.showMessage('삭제할 버튼이 없습니다.', 'info');
+            return;
+        }
+        
         if (!confirm('정말 모든 버튼을 삭제하시겠습니까?')) {
             return;
         }
@@ -234,8 +281,21 @@ class VendingMachine {
         const examples = this.config.examples[this.role];
         if (!examples) return;
         
-        this.clearAllButtons();
+        // 기존 버튼 삭제 여부 확인
+        if (this.buttons.length > 0) {
+            if (!confirm('예시를 불러오면 현재 버튼이 모두 삭제됩니다. 계속하시겠습니까?')) {
+                return;
+            }
+        }
         
+        // 버튼 초기화
+        this.buttons = [];
+        const buttonsGrid = this.container.querySelector('.buttons-grid');
+        if (buttonsGrid) {
+            buttonsGrid.innerHTML = '';
+        }
+        
+        // 예시 버튼 추가
         examples.forEach((example, index) => {
             setTimeout(() => {
                 this.addButton(example);
@@ -312,11 +372,34 @@ class VendingMachine {
     /**
      * 메시지 표시
      * @param {string} message - 메시지 내용
-     * @param {string} type - 메시지 타입 (success, warning, error)
+     * @param {string} type - 메시지 타입 (success, warning, error, info)
      */
     showMessage(message, type = 'info') {
-        // 메시지 표시 로직 (토스트 또는 모달)
-        console.log(`[${type.toUpperCase()}] ${message}`);
+        // 토스트 메시지 생성
+        const toast = document.createElement('div');
+        toast.className = `toast-message toast-${type}`;
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${type === 'error' ? '#f44336' : type === 'warning' ? '#ff9800' : type === 'success' ? '#4caf50' : '#2196f3'};
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10000;
+            animation: slideInUp 0.3s ease;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // 3초 후 제거
+        setTimeout(() => {
+            toast.style.animation = 'slideOutDown 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
     
     /**
