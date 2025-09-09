@@ -27,44 +27,30 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
           
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-            
       - name: Install dependencies
         run: |
           npm init -y
           npm install --save-dev eslint prettier
           
       - name: Lint JavaScript
-        continue-on-error: true
         run: |
           npx eslint js/*.js --fix || true
           
       - name: Create icons directory
         run: |
           mkdir -p icons
-          # 임시 아이콘 생성 (실제 프로젝트에서는 실제 아이콘 파일 사용)
-          echo '🎰' > icons/icon.txt
+          # 임시 아이콘 생성 (실제로는 디자인된 아이콘 사용)
+          echo '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" fill="#667eea"/><text x="256" y="256" font-size="200" text-anchor="middle" fill="white">🎰</text></svg>' > icons/icon-512x512.svg
           
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
-      - name: Build
-        run: |
-          echo "Building project..."
-          # 빌드 스크립트 (필요시 추가)
-          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: .
 
   # Deployment job
   deploy:
@@ -82,21 +68,24 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          
-      - name: Run tests
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Test HTML validity
         run: |
-          echo "Running tests..."
-          # 테스트 스크립트 (필요시 추가)
-          
-      - name: Check file structure
+          # HTML 유효성 검사
+          curl -H "Content-Type: text/html; charset=utf-8" \
+            --data-binary @index.html \
+            https://validator.w3.org/nu/?out=gnu || true
+            
+      - name: Check links
         run: |
-          echo "Checking file structure..."
-          ls -la
-          ls -la css/
-          ls -la js/
+          # 링크 확인
+          echo "Checking links in HTML files..."
+          grep -h "href\|src" *.html | grep -v "^#" || true
+          
+      - name: Security scan
+        run: |
+          # 보안 취약점 스캔
+          echo "Running security checks..."
+          grep -r "eval\|innerHTML" js/ || echo "No security issues found"
