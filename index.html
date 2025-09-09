@@ -403,11 +403,6 @@
             color: white;
         }
         
-        .export-button {
-            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
-            color: white;
-        }
-        
         .capture-button {
             background: linear-gradient(135deg, #9C27B0, #673AB7);
             color: white;
@@ -808,7 +803,6 @@
             <div class="actions">
                 <button class="action-button save-button" onclick="saveData()">💾 저장하기</button>
                 <button class="action-button capture-button" onclick="showCaptureModal()">📸 이미지 캡처</button>
-                <button class="action-button export-button" onclick="exportData()">📤 JSON 내보내기</button>
                 <button class="action-button print-button" onclick="printMachines()">🖨️ PDF 인쇄</button>
                 <button class="action-button reset-button" onclick="resetAll()">🔄 전체 초기화</button>
             </div>
@@ -1163,36 +1157,6 @@
                     }
                 });
             }
-        }
-        
-        // 데이터 내보내기
-        function exportData() {
-            const data = {};
-            ['mom', 'dad', 'daughter', 'son'].forEach(role => {
-                const buttons = [];
-                const container = document.getElementById(role + '-buttons');
-                container.querySelectorAll('.vending-button').forEach(button => {
-                    buttons.push({
-                        emoji: button.querySelector('.button-emoji').textContent,
-                        label: button.querySelector('.button-input').value,
-                        filled: button.classList.contains('filled')
-                    });
-                });
-                data[role] = {
-                    name: document.querySelector(`[data-role="${role}"]`).value,
-                    buttons: buttons
-                };
-            });
-            
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = 'family-vending-machine.json';
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
         }
         
         // 인쇄
