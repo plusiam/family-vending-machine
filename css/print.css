@@ -1,0 +1,256 @@
+/* ================================
+   우리 가족 자판기 - 인쇄 스타일
+   ================================ */
+
+@media print {
+    /* 기본 설정 */
+    * {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    body {
+        background: white !important;
+        padding: 0;
+        margin: 0;
+        font-size: 12pt;
+    }
+    
+    .container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* 불필요한 요소 숨기기 */
+    .header,
+    .theme-selector,
+    .help-button,
+    .button-controls,
+    .actions,
+    .saved-message,
+    .button-delete,
+    .char-counter,
+    .input-warning,
+    .tabs,
+    .emoji-picker,
+    .capture-modal,
+    .loading-spinner {
+        display: none !important;
+    }
+    
+    /* 탭 컨테이너 스타일 */
+    .tab-container {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+        padding: 20px;
+        margin: 0;
+    }
+    
+    /* 모든 탭 내용 표시 */
+    .tab-content {
+        display: block !important;
+        page-break-after: always;
+        margin-bottom: 30px;
+    }
+    
+    .tab-content:last-child {
+        page-break-after: auto;
+    }
+    
+    /* 자판기 스타일 */
+    .vending-machine {
+        border: 2px solid #333;
+        page-break-inside: avoid;
+        margin: 0 auto 20px;
+        max-width: 100%;
+    }
+    
+    /* 자판기 헤더 */
+    .machine-header {
+        background: #FF6B6B !important;
+        color: white !important;
+        border: 1px solid #333;
+        padding: 15px;
+    }
+    
+    .machine-header h2 {
+        margin: 0 0 10px 0;
+        font-size: 18pt;
+        color: white !important;
+    }
+    
+    /* 이름 입력 필드 (인쇄 시) */
+    .machine-header input,
+    .name-input {
+        border: none;
+        background: transparent;
+        color: white !important;
+        font-weight: bold;
+        text-align: center;
+        font-size: 14pt;
+        padding: 5px;
+    }
+    
+    .name-input-wrapper {
+        width: 100%;
+        max-width: none;
+    }
+    
+    /* 버튼 그리드 */
+    .buttons-grid {
+        page-break-inside: avoid;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        padding: 15px;
+        background: white;
+        border: 1px solid #ddd;
+        min-height: auto;
+    }
+    
+    /* 자판기 버튼 */
+    .vending-button {
+        page-break-inside: avoid;
+        border: 2px solid #333;
+        padding: 10px;
+        min-height: 80px;
+        background: white !important;
+    }
+    
+    .vending-button.filled {
+        background: #667eea !important;
+        color: white !important;
+    }
+    
+    .vending-button.filled .button-label,
+    .vending-button.filled .button-input {
+        color: white !important;
+    }
+    
+    /* 버튼 내용 */
+    .button-emoji {
+        font-size: 24pt;
+        margin-bottom: 5px;
+    }
+    
+    .button-label,
+    .button-input {
+        font-size: 10pt;
+        color: #333;
+        font-weight: bold;
+    }
+    
+    .button-number {
+        background: #333 !important;
+        color: white !important;
+        font-weight: bold;
+    }
+    
+    /* 페이지 설정 */
+    @page {
+        size: A4;
+        margin: 20mm;
+    }
+    
+    /* 페이지 제목 추가 */
+    .tab-content::before {
+        content: attr(data-title);
+        display: block;
+        font-size: 20pt;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        padding: 10px;
+        border-bottom: 2px solid #333;
+    }
+    
+    #mom-tab::before { content: "👩 엄마 자판기"; }
+    #dad-tab::before { content: "👨 아빠 자판기"; }
+    #daughter-tab::before { content: "👧 딸 자판기"; }
+    #son-tab::before { content: "👦 아들 자판기"; }
+    
+    /* 모바일 인쇄 최적화 */
+    @media (max-width: 600px) {
+        .buttons-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .vending-button {
+            min-height: 60px;
+            padding: 8px;
+        }
+        
+        .button-emoji {
+            font-size: 18pt;
+        }
+        
+        .button-label,
+        .button-input {
+            font-size: 9pt;
+        }
+    }
+    
+    /* 긴 텍스트 처리 */
+    .button-label,
+    .button-input {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+    }
+    
+    /* 색상 보정 */
+    .vending-button {
+        -webkit-filter: none !important;
+        filter: none !important;
+    }
+    
+    /* 그림자 제거 */
+    * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+    
+    /* 링크 스타일 */
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    /* 이미지 최적화 */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* 페이지 번호 (브라우저 자동 추가) */
+    .page-number {
+        position: fixed;
+        bottom: 10mm;
+        right: 10mm;
+        font-size: 10pt;
+        color: #666;
+    }
+}
+
+/* 인쇄 미리보기 모드 */
+.print-preview {
+    background: white;
+    padding: 20px;
+}
+
+.print-preview .tab-content {
+    display: block;
+    margin-bottom: 40px;
+    border: 1px solid #ddd;
+    padding: 20px;
+}
+
+.print-preview .header,
+.print-preview .actions,
+.print-preview .button-controls {
+    display: none;
+}
