@@ -1,213 +1,180 @@
 /**
- * 서비스 워커 - PWA 지원
- * 오프라인 기능 및 캐싱 전략
+ * 우리 가족 자판기 - Service Worker (PWA)
  */
 
-const CACHE_NAME = 'family-vending-machine-v2.0';
+const CACHE_NAME = 'family-vending-machine-v2.0.0';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/css/main.css',
-    '/css/themes.css',
-    '/css/print.css',
-    '/js/config.js',
-    '/js/app.js',
-    '/js/vending-machine.js',
-    '/js/storage.js',
-    '/js/capture.js',
-    '/manifest.json',
-    'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
+  '/family-vending-machine/',
+  '/family-vending-machine/index.html',
+  '/family-vending-machine/css/main.css',
+  '/family-vending-machine/css/themes.css',
+  '/family-vending-machine/css/print.css',
+  '/family-vending-machine/js/config.js',
+  '/family-vending-machine/js/app.js',
+  '/family-vending-machine/js/vending-machine.js',
+  '/family-vending-machine/js/storage.js',
+  '/family-vending-machine/js/capture.js',
+  '/family-vending-machine/manifest.json',
+  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
 ];
 
-// 서비스 워커 설치
+// 설치 이벤트
 self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('Opened cache');
-                return cache.addAll(urlsToCache);
-            })
-            .then(() => {
-                // 즉시 활성화
-                return self.skipWaiting();
-            })
-    );
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
+      .catch(err => {
+        console.error('Cache install failed:', err);
+      })
+  );
+  // 즉시 활성화
+  self.skipWaiting();
 });
 
-// 서비스 워커 활성화
+// 활성화 이벤트
 self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('Deleting old cache:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(() => {
-            // 모든 클라이언트 제어
-            return self.clients.claim();
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
         })
-    );
+      );
+    })
+  );
+  // 즉시 컨트롤 획득
+  self.clients.claim();
 });
 
-// 네트워크 요청 가로채기
+// 페치 이벤트 - 캐시 우선, 네트워크 폴백
 self.addEventListener('fetch', event => {
-    // POST 요청은 캐시하지 않음
-    if (event.request.method !== 'GET') {
-        return;
-    }
-    
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                // 캐시에서 찾으면 반환
-                if (response) {
-                    return response;
-                }
-                
-                // 네트워크 요청
-                return fetch(event.request).then(response => {
-                    // 유효한 응답이 아니면 그대로 반환
-                    if (!response || response.status !== 200 || response.type !== 'basic') {
-                        return response;
-                    }
-                    
-                    // 응답 복사하여 캐시에 저장
-                    const responseToCache = response.clone();
-                    
-                    caches.open(CACHE_NAME)
-                        .then(cache => {
-                            cache.put(event.request, responseToCache);
-                        });
-                    
-                    return response;
-                }).catch(() => {
-                    // 오프라인 폴백 페이지
-                    return new Response(
-                        `<!DOCTYPE html>
-                        <html lang="ko">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>오프라인 - 우리 가족 자판기</title>
-                            <style>
-                                body {
-                                    font-family: 'Noto Sans KR', sans-serif;
-                                    display: flex;
-                                    justify-content: center;
-                                    align-items: center;
-                                    height: 100vh;
-                                    margin: 0;
-                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                    color: white;
-                                    text-align: center;
-                                }
-                                .offline-container {
-                                    padding: 40px;
-                                    background: rgba(255, 255, 255, 0.1);
-                                    border-radius: 20px;
-                                    backdrop-filter: blur(10px);
-                                }
-                                h1 { font-size: 2.5em; margin-bottom: 20px; }
-                                p { font-size: 1.2em; margin-bottom: 30px; }
-                                button {
-                                    padding: 15px 30px;
-                                    font-size: 1.1em;
-                                    background: white;
-                                    color: #667eea;
-                                    border: none;
-                                    border-radius: 25px;
-                                    cursor: pointer;
-                                }
-                                button:hover { transform: scale(1.05); }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="offline-container">
-                                <h1>🔌 오프라인 상태입니다</h1>
-                                <p>인터넷 연결을 확인해주세요.</p>
-                                <p>저장된 데이터는 안전하게 보관됩니다.</p>
-                                <button onclick="location.reload()">다시 시도</button>
-                            </div>
-                        </body>
-                        </html>`,
-                        {
-                            headers: { 'Content-Type': 'text/html; charset=utf-8' }
-                        }
-                    );
-                });
-            })
-    );
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // 캐시에 있으면 반환
+        if (response) {
+          return response;
+        }
+        
+        // 네트워크 요청
+        return fetch(event.request).then(
+          response => {
+            // 유효한 응답이 아니면 반환
+            if(!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+            
+            // 응답 복제하여 캐시에 저장
+            const responseToCache = response.clone();
+            
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+            
+            return response;
+          }
+        );
+      })
+      .catch(err => {
+        // 오프라인 폴백
+        console.error('Fetch failed:', err);
+        // 오프라인 페이지 반환 (필요 시)
+        return caches.match('/family-vending-machine/offline.html');
+      })
+  );
 });
 
 // 백그라운드 동기화
 self.addEventListener('sync', event => {
-    if (event.tag === 'sync-data') {
-        event.waitUntil(
-            // 데이터 동기화 로직
-            syncData()
-        );
-    }
+  if (event.tag === 'sync-data') {
+    event.waitUntil(
+      // 데이터 동기화 로직
+      syncData()
+    );
+  }
 });
 
 // 푸시 알림
 self.addEventListener('push', event => {
-    const options = {
-        body: event.data ? event.data.text() : '새로운 기능이 추가되었습니다!',
-        icon: '/icon-192.png',
-        badge: '/badge-72.png',
-        vibrate: [200, 100, 200],
-        data: {
-            dateOfArrival: Date.now(),
-            primaryKey: 1
-        },
-        actions: [
-            {
-                action: 'explore',
-                title: '확인하기',
-                icon: '/check.png'
-            },
-            {
-                action: 'close',
-                title: '닫기',
-                icon: '/close.png'
-            }
-        ]
-    };
-    
-    event.waitUntil(
-        self.registration.showNotification('우리 가족 자판기', options)
-    );
+  const options = {
+    body: event.data ? event.data.text() : '새로운 알림이 있습니다.',
+    icon: '/family-vending-machine/icons/icon-192x192.png',
+    badge: '/family-vending-machine/icons/badge-72x72.png',
+    vibrate: [200, 100, 200],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: 1
+    },
+    actions: [
+      {
+        action: 'explore',
+        title: '열기',
+        icon: '/family-vending-machine/icons/checkmark.png'
+      },
+      {
+        action: 'close',
+        title: '닫기',
+        icon: '/family-vending-machine/icons/xmark.png'
+      },
+    ]
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification('우리 가족 자판기', options)
+  );
 });
 
-// 알림 클릭 처리
+// 알림 클릭
 self.addEventListener('notificationclick', event => {
-    event.notification.close();
-    
-    if (event.action === 'explore') {
-        event.waitUntil(
-            clients.openWindow('/')
-        );
-    }
+  event.notification.close();
+  
+  if (event.action === 'explore') {
+    // 앱 열기
+    event.waitUntil(
+      clients.openWindow('/family-vending-machine/')
+    );
+  }
 });
 
 // 데이터 동기화 함수
 async function syncData() {
-    try {
-        // 로컬 스토리지 데이터를 서버와 동기화하는 로직
-        // (서버 API가 있을 경우 구현)
-        console.log('Data synchronized');
-    } catch (error) {
-        console.error('Sync failed:', error);
-    }
+  try {
+    // IndexedDB에서 데이터 가져오기
+    const data = await getDataFromIndexedDB();
+    
+    // 서버로 전송 (필요 시)
+    // await sendDataToServer(data);
+    
+    console.log('Data synced successfully');
+  } catch (error) {
+    console.error('Sync failed:', error);
+  }
 }
 
-// 캐시 버전 관리
+// IndexedDB 데이터 가져오기
+function getDataFromIndexedDB() {
+  return new Promise((resolve, reject) => {
+    // IndexedDB 로직
+    resolve({});
+  });
+}
+
+// 캐시 업데이트 알림
 self.addEventListener('message', event => {
-    if (event.data.action === 'skipWaiting') {
-        self.skipWaiting();
-    }
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    caches.delete(CACHE_NAME).then(() => {
+      console.log('Cache cleared');
+    });
+  }
 });

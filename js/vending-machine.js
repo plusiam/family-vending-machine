@@ -16,6 +16,7 @@ class VendingMachine {
         this.name = '';
         this.container = null;
         this.isModified = false;
+        this.draggedButton = null;
         
         this.init();
     }
@@ -35,7 +36,7 @@ class VendingMachine {
     }
     
     /**
-     * 이벤트 리스너 설정
+     * 이벤트 리스너 설정 - 이벤트 위임 패턴 적용
      */
     setupEventListeners() {
         // 이름 입력 이벤트
@@ -45,6 +46,122 @@ class VendingMachine {
                 this.setName(e.target.value);
             });
         }
+        
+        // 이벤트 위임 - 버튼 그리드에 한 번만 등록
+        const buttonsGrid = this.container.querySelector('.buttons-grid');
+        if (buttonsGrid) {
+            // 클릭 이벤트 위임
+            buttonsGrid.addEventListener('click', (e) => {
+                // 이모지 클릭
+                if (e.target.classList.contains('button-emoji')) {
+                    const buttonId = e.target.closest('[data-button-id]').dataset.buttonId;
+                    window.VendingMachineApp.selectEmoji(buttonId);
+                }
+                // 삭제 버튼 클릭
+                else if (e.target.classList.contains('button-delete')) {
+                    const buttonId = e.target.closest('[data-button-id]').dataset.buttonId;
+                    window.VendingMachineApp.deleteButton(buttonId);
+                }
+            });
+            
+            // 체인지 이벤트 위임
+            buttonsGrid.addEventListener('change', (e) => {
+                if (e.target.classList.contains('button-input')) {
+                    const buttonId = e.target.closest('[data-button-id]').dataset.buttonId;
+                    window.VendingMachineApp.updateButtonText(buttonId, e.target.value);
+                }
+            });
+            
+            // 드래그 앤 드롭 이벤트
+            this.setupDragAndDrop(buttonsGrid);
+        }
+    }
+    
+    /**
+     * 드래그 앤 드롭 설정
+     */
+    setupDragAndDrop(container) {
+        container.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('vending-button')) {
+                this.draggedButton = e.target;
+                e.target.style.opacity = '0.5';
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', e.target.innerHTML);
+            }
+        });
+        
+        container.addEventListener('dragend', (e) => {
+            if (e.target.classList.contains('vending-button')) {
+                e.target.style.opacity = '';
+            }
+        });
+        
+        container.addEventListener('dragover', (e) => {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            
+            const afterElement = this.getDragAfterElement(container, e.clientY);
+            if (afterElement == null) {
+                container.appendChild(this.draggedButton);
+            } else {
+                container.insertBefore(this.draggedButton, afterElement);
+            }
+            
+            return false;
+        });
+        
+        container.addEventListener('drop', (e) => {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
+            // 버튼 순서 업데이트
+            this.updateButtonOrderFromDOM();
+            this.isModified = true;
+            this.autoSave();
+            
+            return false;
+        });
+    }
+    
+    /**
+     * 드래그 위치 계산
+     */
+    getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.vending-button:not(.dragging)')];
+        
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+    
+    /**
+     * DOM에서 버튼 순서 업데이트
+     */
+    updateButtonOrderFromDOM() {
+        const buttonElements = this.container.querySelectorAll('.vending-button');
+        buttonElements.forEach((element, index) => {
+            const buttonId = element.dataset.buttonId;
+            const button = this.buttons.find(b => b.id === buttonId);
+            if (button) {
+                button.order = index + 1;
+            }
+            
+            // 순서 번호 업데이트
+            const numberSpan = element.querySelector('.button-number');
+            if (numberSpan) {
+                numberSpan.textContent = index + 1;
+            }
+        });
     }
     
     /**
@@ -57,11 +174,12 @@ class VendingMachine {
     }
     
     /**
-     * 입력값 검증 및 정제
+     * 입력값 검증 및 새니타이징
      */
     sanitizeInput(text) {
-        // HTML 태그 제거 및 길이 제한
-        const cleaned = text.replace(/<[^>]*>?/gm, '');
+        // 기본 HTML 태그 제거
+        const cleaned = text.replace(/<[^>]*>/g, '');
+        // 길이 제한
         return cleaned.substring(0, this.config.button.maxTextLength);
     }
     
@@ -70,9 +188,9 @@ class VendingMachine {
      * @param {string} name - 자판기 소유자 이름
      */
     setName(name) {
-        const sanitized = this.sanitizeInput(name);
-        if (sanitized.length <= this.config.machine.maxNameLength) {
-            this.name = sanitized;
+        const sanitizedName = this.sanitizeInput(name);
+        if (sanitizedName.length <= this.config.machine.maxNameLength) {
+            this.name = sanitizedName;
             this.isModified = true;
             this.updateCharCounter();
             this.autoSave();
@@ -91,8 +209,6 @@ class VendingMachine {
             const maxLength = this.config.machine.maxNameLength;
             
             counter.textContent = `${length}/${maxLength}`;
-            counter.setAttribute('aria-live', 'polite');
-            counter.setAttribute('aria-label', `${length}자 입력됨, 최대 ${maxLength}자`);
             
             // 스타일 클래스 적용
             counter.classList.remove('warning', 'error');
@@ -101,11 +217,8 @@ class VendingMachine {
             if (length >= maxLength) {
                 counter.classList.add('error');
                 input.classList.add('error');
-                input.setAttribute('aria-invalid', 'true');
             } else if (length >= maxLength - 5) {
                 counter.classList.add('warning');
-            } else {
-                input.setAttribute('aria-invalid', 'false');
             }
         }
     }
@@ -145,7 +258,7 @@ class VendingMachine {
     }
     
     /**
-     * 버튼 렌더링 (접근성 개선)
+     * 버튼 렌더링 - 접근성 개선
      * @param {Object} button - 버튼 객체
      */
     renderButton(button) {
@@ -155,12 +268,9 @@ class VendingMachine {
         const buttonElement = document.createElement('div');
         buttonElement.className = 'vending-button filled';
         buttonElement.dataset.buttonId = button.id;
-        buttonElement.setAttribute('role', 'group');
-        buttonElement.setAttribute('aria-label', `버튼 ${button.order}: ${button.emoji} ${button.text || '텍스트 없음'}`);
-        
-        // 드래그 가능 속성 추가
-        buttonElement.draggable = true;
-        buttonElement.dataset.order = button.order;
+        buttonElement.draggable = true; // 드래그 가능
+        buttonElement.setAttribute('role', 'listitem');
+        buttonElement.setAttribute('aria-label', `버튼 ${button.order}: ${button.emoji} ${button.text}`);
         
         // 버튼 번호
         const buttonNumber = document.createElement('span');
@@ -168,52 +278,28 @@ class VendingMachine {
         buttonNumber.textContent = button.order;
         buttonNumber.setAttribute('aria-hidden', 'true');
         
-        // 이모지 버튼 (접근성 개선)
+        // 이모지 버튼 - 접근성 개선
         const buttonEmoji = document.createElement('button');
         buttonEmoji.className = 'button-emoji';
         buttonEmoji.textContent = button.emoji;
-        buttonEmoji.setAttribute('aria-label', `이모지 변경, 현재: ${button.emoji}`);
-        buttonEmoji.setAttribute('title', '클릭하여 이모지 변경');
+        buttonEmoji.setAttribute('aria-label', `이모지 변경: 현재 ${button.emoji}`);
         buttonEmoji.setAttribute('tabindex', '0');
-        buttonEmoji.addEventListener('click', () => {
-            window.VendingMachineApp.selectEmoji(button.id);
-        });
         
-        // 키보드 접근성
-        buttonEmoji.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                window.VendingMachineApp.selectEmoji(button.id);
-            }
-        });
-        
-        // 텍스트 입력 (접근성 개선)
+        // 텍스트 입력 - 접근성 개선
         const buttonInput = document.createElement('input');
         buttonInput.type = 'text';
         buttonInput.className = 'button-input';
         buttonInput.placeholder = '텍스트 입력';
         buttonInput.value = this.escapeHtml(button.text);
         buttonInput.maxLength = this.config.button.maxTextLength;
-        buttonInput.setAttribute('aria-label', `버튼 ${button.order}의 텍스트`);
-        buttonInput.addEventListener('change', (e) => {
-            window.VendingMachineApp.updateButtonText(button.id, e.target.value);
-        });
+        buttonInput.setAttribute('aria-label', `버튼 ${button.order} 텍스트`);
         
-        // 삭제 버튼 (접근성 개선)
+        // 삭제 버튼 - 접근성 개선
         const deleteButton = document.createElement('button');
         deleteButton.className = 'button-delete';
         deleteButton.textContent = '×';
         deleteButton.setAttribute('aria-label', `버튼 ${button.order} 삭제`);
-        deleteButton.setAttribute('title', '버튼 삭제');
         deleteButton.setAttribute('tabindex', '0');
-        deleteButton.addEventListener('click', () => {
-            if (confirm(`"${button.emoji} ${button.text}" 버튼을 삭제하시겠습니까?`)) {
-                window.VendingMachineApp.deleteButton(button.id);
-            }
-        });
-        
-        // 드래그 앤 드롭 이벤트
-        this.setupDragAndDrop(buttonElement, button);
         
         // 버튼 요소들 추가
         buttonElement.appendChild(buttonNumber);
@@ -230,79 +316,6 @@ class VendingMachine {
     }
     
     /**
-     * 드래그 앤 드롭 설정
-     */
-    setupDragAndDrop(element, button) {
-        element.addEventListener('dragstart', (e) => {
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('buttonId', button.id);
-            element.classList.add('dragging');
-        });
-        
-        element.addEventListener('dragend', () => {
-            element.classList.remove('dragging');
-        });
-        
-        element.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            
-            const draggingElement = document.querySelector('.dragging');
-            if (draggingElement && draggingElement !== element) {
-                const rect = element.getBoundingClientRect();
-                const midpoint = rect.y + rect.height / 2;
-                
-                if (e.clientY < midpoint) {
-                    element.classList.add('drag-over-top');
-                    element.classList.remove('drag-over-bottom');
-                } else {
-                    element.classList.add('drag-over-bottom');
-                    element.classList.remove('drag-over-top');
-                }
-            }
-        });
-        
-        element.addEventListener('dragleave', () => {
-            element.classList.remove('drag-over-top', 'drag-over-bottom');
-        });
-        
-        element.addEventListener('drop', (e) => {
-            e.preventDefault();
-            element.classList.remove('drag-over-top', 'drag-over-bottom');
-            
-            const draggedId = e.dataTransfer.getData('buttonId');
-            if (draggedId && draggedId !== button.id) {
-                this.reorderButtons(draggedId, button.id);
-            }
-        });
-    }
-    
-    /**
-     * 버튼 순서 재정렬
-     */
-    reorderButtons(draggedId, targetId) {
-        const draggedIndex = this.buttons.findIndex(b => b.id === draggedId);
-        const targetIndex = this.buttons.findIndex(b => b.id === targetId);
-        
-        if (draggedIndex === -1 || targetIndex === -1) return;
-        
-        // 배열에서 버튼 이동
-        const [draggedButton] = this.buttons.splice(draggedIndex, 1);
-        this.buttons.splice(targetIndex, 0, draggedButton);
-        
-        // 순서 번호 업데이트
-        this.buttons.forEach((btn, idx) => {
-            btn.order = idx + 1;
-        });
-        
-        // 전체 다시 렌더링
-        this.render();
-        this.autoSave();
-        
-        this.showMessage('버튼 순서가 변경되었습니다', 'success');
-    }
-    
-    /**
      * 버튼 업데이트
      * @param {string} buttonId - 버튼 ID
      * @param {Object} updates - 업데이트할 속성
@@ -311,6 +324,7 @@ class VendingMachine {
         const button = this.buttons.find(b => b.id === buttonId);
         if (!button) return;
         
+        // 입력값 새니타이징
         if (updates.text !== undefined) {
             updates.text = this.sanitizeInput(updates.text);
         }
@@ -322,15 +336,13 @@ class VendingMachine {
         const buttonElement = this.container.querySelector(`[data-button-id="${buttonId}"]`);
         if (buttonElement) {
             if (updates.emoji) {
-                const emojiBtn = buttonElement.querySelector('.button-emoji');
-                emojiBtn.textContent = updates.emoji;
-                emojiBtn.setAttribute('aria-label', `이모지 변경, 현재: ${updates.emoji}`);
+                buttonElement.querySelector('.button-emoji').textContent = updates.emoji;
             }
             if (updates.text !== undefined) {
-                buttonElement.querySelector('.button-input').value = updates.text;
+                buttonElement.querySelector('.button-input').value = this.escapeHtml(updates.text);
             }
             // ARIA 레이블 업데이트
-            buttonElement.setAttribute('aria-label', `버튼 ${button.order}: ${button.emoji} ${button.text || '텍스트 없음'}`);
+            buttonElement.setAttribute('aria-label', `버튼 ${button.order}: ${button.emoji} ${button.text}`);
         }
         
         this.autoSave();
@@ -378,7 +390,12 @@ class VendingMachine {
             if (numberSpan) {
                 numberSpan.textContent = index + 1;
             }
-            element.setAttribute('aria-label', element.getAttribute('aria-label').replace(/버튼 \d+/, `버튼 ${index + 1}`));
+            // ARIA 레이블 업데이트
+            const buttonId = element.dataset.buttonId;
+            const button = this.buttons.find(b => b.id === buttonId);
+            if (button) {
+                element.setAttribute('aria-label', `버튼 ${index + 1}: ${button.emoji} ${button.text}`);
+            }
         });
     }
     
@@ -443,6 +460,9 @@ class VendingMachine {
         if (!buttonsGrid) return;
         
         buttonsGrid.innerHTML = '';
+        buttonsGrid.setAttribute('role', 'list');
+        buttonsGrid.setAttribute('aria-label', `${this.role} 자판기 버튼 목록`);
+        
         this.buttons.forEach(button => this.renderButton(button));
     }
     
@@ -488,11 +508,12 @@ class VendingMachine {
     }
     
     /**
-     * 자동 저장
+     * 자동 저장 - 디바운싱 적용
      */
     autoSave() {
         if (!this.config.storage.autoSave) return;
         
+        // 디바운싱
         clearTimeout(this.autoSaveTimer);
         this.autoSaveTimer = setTimeout(() => {
             if (window.VendingMachineApp) {

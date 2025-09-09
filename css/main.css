@@ -1,21 +1,19 @@
 /**
- * 우리 가족 자판기 - 메인 스타일시트
- * Responsive & Accessible Design
+ * 우리 가족 자판기 - 메인 스타일
  */
 
+/* 기본 설정 */
 :root {
     --primary-color: #667eea;
     --secondary-color: #764ba2;
-    --danger-color: #f44336;
-    --warning-color: #ff9800;
     --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
     --info-color: #2196f3;
-    --bg-color: #f5f5f5;
-    --text-color: #333;
     --border-radius: 15px;
     --transition: all 0.3s ease;
-    --mobile-breakpoint: 768px;
-    --tablet-breakpoint: 1024px;
+    --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --box-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 * {
@@ -29,57 +27,29 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
-    color: var(--text-color);
+    overflow-x: hidden;
 }
 
-/* 접근성: 포커스 스타일 개선 */
-*:focus-visible {
-    outline: 3px solid var(--primary-color);
-    outline-offset: 2px;
-}
-
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-    outline: 3px solid var(--primary-color);
-    outline-offset: 2px;
-}
-
-/* 스킵 네비게이션 (접근성) */
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    background: var(--primary-color);
-    color: white;
-    padding: 8px;
-    text-decoration: none;
-    z-index: 100;
-}
-
-.skip-link:focus {
-    top: 0;
-}
-
+/* 컨테이너 */
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    background: white;
-    border-radius: 20px;
-    padding: clamp(20px, 3vw, 40px);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease;
 }
 
+/* 헤더 */
 .header {
     text-align: center;
     margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
 }
 
 .header h1 {
+    color: #333;
     font-size: clamp(1.5rem, 4vw, 2.5rem);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     margin-bottom: 10px;
 }
 
@@ -88,7 +58,7 @@ textarea:focus-visible {
     font-size: clamp(0.9rem, 2vw, 1.1rem);
 }
 
-/* 테마 선택기 - 모바일 반응형 */
+/* 테마 선택기 */
 .theme-selector {
     display: flex;
     gap: 10px;
@@ -104,12 +74,12 @@ textarea:focus-visible {
     border-radius: 20px;
     cursor: pointer;
     transition: var(--transition);
-    font-size: clamp(0.85rem, 1.5vw, 1rem);
+    font-size: 14px;
 }
 
 .theme-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .theme-btn.active {
@@ -118,35 +88,67 @@ textarea:focus-visible {
     border-color: var(--primary-color);
 }
 
-/* 탭 시스템 - 모바일 반응형 */
+/* 탭 컨테이너 */
 .tab-container {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: var(--box-shadow);
     position: relative;
 }
 
+/* 도움말 버튼 */
+.help-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--info-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.help-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+}
+
+/* 탭 버튼 */
 .tabs {
     display: flex;
     gap: 10px;
     margin-bottom: 30px;
-    border-bottom: 2px solid #e0e0e0;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    flex-wrap: wrap;
 }
 
 .tab-button {
-    padding: 12px 24px;
+    padding: 10px 20px;
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: clamp(0.9rem, 2vw, 1.1rem);
-    color: #666;
+    font-size: 16px;
     transition: var(--transition);
-    white-space: nowrap;
+    border-radius: 10px 10px 0 0;
     position: relative;
 }
 
+.tab-button:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
 .tab-button.active {
-    color: var(--primary-color);
-    font-weight: bold;
+    background: var(--primary-color);
+    color: white;
 }
 
 .tab-button.active::after {
@@ -155,10 +157,11 @@ textarea:focus-visible {
     bottom: -2px;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background: var(--primary-color);
 }
 
+/* 탭 콘텐츠 */
 .tab-content {
     display: none;
     animation: fadeIn 0.3s ease;
@@ -168,54 +171,57 @@ textarea:focus-visible {
     display: block;
 }
 
-/* 자판기 컨테이너 */
+/* 자판기 */
 .vending-machine {
-    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    padding: 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     border-radius: var(--border-radius);
-    padding: clamp(20px, 3vw, 30px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .machine-header {
+    text-align: center;
     margin-bottom: 20px;
 }
 
 .machine-header h2 {
+    color: #333;
+    margin-bottom: 15px;
     font-size: clamp(1.3rem, 3vw, 1.8rem);
-    color: var(--primary-color);
+}
+
+/* 이름 입력 */
+.name-input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     margin-bottom: 15px;
 }
 
-/* 이름 입력 - 접근성 개선 */
-.name-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
 .name-input {
-    flex: 1;
     padding: 10px 15px;
     border: 2px solid #ddd;
-    border-radius: 10px;
-    font-size: 1rem;
+    border-radius: 25px;
+    font-size: 16px;
+    width: 250px;
+    max-width: 100%;
     transition: var(--transition);
 }
 
 .name-input:focus {
+    outline: none;
     border-color: var(--primary-color);
-    background-color: #f9f9ff;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.name-input[aria-invalid="true"] {
-    border-color: var(--danger-color);
+.name-input.error {
+    border-color: var(--error-color);
 }
 
 .char-counter {
-    font-size: 0.9rem;
+    font-size: 14px;
     color: #666;
-    min-width: 50px;
 }
 
 .char-counter.warning {
@@ -223,14 +229,14 @@ textarea:focus-visible {
 }
 
 .char-counter.error {
-    color: var(--danger-color);
-    font-weight: bold;
+    color: var(--error-color);
 }
 
-/* 버튼 컨트롤 - 모바일 반응형 */
+/* 버튼 컨트롤 */
 .button-controls {
     display: flex;
     gap: 10px;
+    justify-content: center;
     margin-bottom: 20px;
     flex-wrap: wrap;
 }
@@ -243,91 +249,78 @@ textarea:focus-visible {
     color: var(--primary-color);
     cursor: pointer;
     transition: var(--transition);
-    font-size: clamp(0.85rem, 1.5vw, 1rem);
-    flex: 1;
-    min-width: 120px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
 }
 
 .control-btn:hover {
     background: var(--primary-color);
     color: white;
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
 /* 버튼 그리드 - 반응형 개선 */
 .buttons-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: clamp(10px, 2vw, 20px);
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: clamp(10px, 2vw, 15px);
     min-height: 200px;
-    padding: 20px;
-    background: white;
-    border-radius: var(--border-radius);
-    position: relative;
-}
-
-/* 빈 그리드 메시지 */
-.buttons-grid:empty::before {
-    content: '버튼을 추가해주세요 ➕';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #ccc;
-    font-size: 1.2rem;
-}
-
-/* 자판기 버튼 - 드래그 앤 드롭 스타일 추가 */
-.vending-button {
-    background: linear-gradient(135deg, #fff 0%, #f5f5f5 100%);
-    border: 2px solid #e0e0e0;
-    border-radius: var(--border-radius);
     padding: 15px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+}
+
+/* 자판기 버튼 */
+.vending-button {
+    aspect-ratio: 1;
+    border: 3px solid #ddd;
+    border-radius: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    background: white;
     transition: var(--transition);
     cursor: move;
     position: relative;
 }
 
+.vending-button:hover {
+    transform: scale(1.05);
+    box-shadow: var(--box-shadow-hover);
+}
+
 .vending-button.dragging {
     opacity: 0.5;
-    transform: scale(0.95);
 }
 
-.vending-button.drag-over-top {
-    border-top: 3px solid var(--primary-color);
+.vending-button.filled {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
 }
 
-.vending-button.drag-over-bottom {
-    border-bottom: 3px solid var(--primary-color);
-}
-
-.vending-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
+/* 버튼 내부 요소 */
 .button-number {
     position: absolute;
     top: 5px;
     left: 5px;
-    background: var(--primary-color);
-    color: white;
-    width: 24px;
-    height: 24px;
+    width: 25px;
+    height: 25px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
+    font-size: 12px;
     font-weight: bold;
 }
 
 .button-emoji {
-    font-size: 2.5rem;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    margin-bottom: 10px;
     cursor: pointer;
     transition: var(--transition);
     background: none;
@@ -339,65 +332,81 @@ textarea:focus-visible {
     transform: scale(1.2);
 }
 
-.button-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
+.button-emoji:focus-visible {
+    outline: 3px solid #4A90E2;
+    outline-offset: 2px;
     border-radius: 8px;
+}
+
+.button-input {
+    width: 90%;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.9);
     text-align: center;
-    font-size: 0.9rem;
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
 }
 
 .button-delete {
     position: absolute;
     top: 5px;
     right: 5px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--danger-color);
+    width: 25px;
+    height: 25px;
+    background: var(--error-color);
     color: white;
     border: none;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 18px;
     line-height: 1;
     transition: var(--transition);
-    opacity: 0;
-}
-
-.vending-button:hover .button-delete {
-    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .button-delete:hover {
+    transform: scale(1.2);
     background: #d32f2f;
-    transform: scale(1.1);
 }
 
-/* 액션 버튼 - 모바일 반응형 */
+.button-delete:focus-visible {
+    outline: 3px solid #ff5252;
+    outline-offset: 2px;
+}
+
+/* 액션 버튼 */
 .actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: clamp(10px, 2vw, 15px);
+    display: flex;
+    gap: 15px;
+    justify-content: center;
     margin-top: 30px;
+    flex-wrap: wrap;
 }
 
 .action-button {
-    padding: 12px 20px;
+    padding: 12px 25px;
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     border: none;
     border-radius: 25px;
     cursor: pointer;
-    font-size: clamp(0.85rem, 1.5vw, 1rem);
+    font-size: 16px;
+    font-weight: 500;
     transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     white-space: nowrap;
-    text-align: center;
 }
 
 .action-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.action-button:active {
+    transform: translateY(-1px);
 }
 
 /* 저장 메시지 */
@@ -407,81 +416,59 @@ textarea:focus-visible {
     right: 30px;
     background: var(--success-color);
     color: white;
-    padding: 15px 30px;
-    border-radius: 50px;
-    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
-    transform: translateY(100px);
-    opacity: 0;
-    transition: var(--transition);
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+    display: none;
+    animation: slideInUp 0.3s ease;
     z-index: 1000;
 }
 
 .saved-message.show {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-/* 토스트 메시지 */
-.toast-message {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 12px 24px;
-    border-radius: 4px;
-    color: white;
-    font-weight: 500;
-    z-index: 10000;
-    animation: slideInUp 0.3s ease;
-}
-
-.toast-success { background: var(--success-color); }
-.toast-warning { background: var(--warning-color); }
-.toast-error { background: var(--danger-color); }
-.toast-info { background: var(--info-color); }
-
-/* 도움말 버튼 */
-.help-button {
-    position: fixed;
-    bottom: 30px;
-    left: 30px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    transition: var(--transition);
-    z-index: 100;
-}
-
-.help-button:hover {
-    transform: scale(1.1);
-    background: var(--secondary-color);
+    display: block;
 }
 
 /* 애니메이션 */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes slideInUp {
-    from { transform: translateX(-50%) translateY(100%); opacity: 0; }
-    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes slideOutDown {
-    from { transform: translateX(-50%) translateY(0); opacity: 1; }
-    to { transform: translateX(-50%) translateY(100%); opacity: 0; }
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
 }
 
 /* 모바일 반응형 */
@@ -491,8 +478,15 @@ textarea:focus-visible {
     }
     
     .container {
-        padding: 20px;
-        border-radius: 15px;
+        padding: 0;
+    }
+    
+    .tab-container {
+        padding: 15px;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
     }
     
     .tabs {
@@ -500,81 +494,140 @@ textarea:focus-visible {
     }
     
     .tab-button {
-        padding: 10px 15px;
+        padding: 8px 12px;
+        font-size: 14px;
     }
     
     .buttons-grid {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         gap: 10px;
-        padding: 15px;
     }
     
-    .vending-button {
-        padding: 10px;
+    .name-input {
+        width: 200px;
     }
     
-    .button-emoji {
-        font-size: 2rem;
+    .control-btn {
+        padding: 8px 15px;
+        font-size: 12px;
     }
     
-    .actions {
-        grid-template-columns: repeat(2, 1fr);
+    .action-button {
+        padding: 10px 20px;
+        font-size: 14px;
     }
     
-    .help-button {
-        width: 45px;
-        height: 45px;
-        bottom: 20px;
-        left: 20px;
-    }
-    
-    /* 모바일에서 이모지 선택 그리드 조정 */
+    /* 모바일에서 이모지 선택기 최적화 */
     .emoji-selector-grid {
         grid-template-columns: repeat(4, 1fr) !important;
     }
     
-    /* 모바일에서 삭제 버튼 항상 표시 */
-    .button-delete {
-        opacity: 1;
+    .emoji-picker {
+        grid-template-columns: repeat(4, 1fr) !important;
+        max-width: 200px !important;
     }
 }
 
-/* 태블릿 반응형 */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (max-width: 480px) {
     .buttons-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    }
-    
-    .actions {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
     }
     
     .emoji-selector-grid {
-        grid-template-columns: repeat(5, 1fr) !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+    
+    .emoji-picker {
+        grid-template-columns: repeat(3, 1fr) !important;
     }
 }
 
-/* 고대비 모드 지원 (접근성) */
+/* 접근성 향상 */
+*:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* 고대비 모드 */
 @media (prefers-contrast: high) {
+    :root {
+        --primary-color: #4050db;
+        --secondary-color: #5a3a7e;
+    }
+    
     .vending-button {
-        border: 3px solid #000;
+        border-width: 4px;
     }
     
-    .button-emoji {
-        filter: contrast(1.2);
-    }
-    
-    .control-btn,
-    .action-button {
-        font-weight: bold;
+    .button-input {
+        border-width: 2px;
     }
 }
 
-/* 모션 감소 선호 사용자 지원 (접근성) */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+/* 어두운 모드 선호 */
+@media (prefers-color-scheme: dark) {
+    body.auto-theme {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     }
+}
+
+/* PWA 설치 프롬프트 */
+.pwa-install-prompt {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 10000;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.pwa-install-prompt.show {
+    display: block;
+    animation: slideInUp 0.3s ease;
+}
+
+.pwa-install-prompt h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.pwa-install-prompt p {
+    margin-bottom: 15px;
+    color: #666;
+}
+
+.pwa-install-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.pwa-install-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.pwa-install-button.install {
+    background: var(--primary-color);
+    color: white;
+}
+
+.pwa-install-button.later {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.pwa-install-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }

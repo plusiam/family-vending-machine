@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="《엄마 자판기》 그림책 연계 교육 활동 - 우리 가족만의 특별한 자판기를 만들어보세요!">
-    <meta name="author" content="룰루랄라 한기쌤">
-    <meta name="theme-color" content="#667eea">
-    <title>우리 가족 자판기 만들기 v2.0</title>
+    <meta name="author" content="룰루랄라 한기샘">
+    <meta name="keywords" content="엄마자판기, 가족활동, 교육활동, 그림책연계, 창의활동">
     
-    <!-- PWA 지원 -->
-    <link rel="manifest" href="manifest.json">
+    <!-- PWA 메타 태그 -->
+    <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="가족자판기">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="우리 가족 자판기 만들기">
+    <meta property="og:description" content="가족이 좋아하는 것들로 특별한 자판기를 만들어보세요!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://plusiam.github.io/family-vending-machine/">
+    
+    <title>우리 가족 자판기 만들기 v2.0</title>
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
     
     <!-- 외부 라이브러리 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -175,43 +185,9 @@
             from { opacity: 1; }
             to { opacity: 0; }
         }
-        
-        /* PWA 설치 프롬프트 */
-        .install-prompt {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: none;
-            align-items: center;
-            gap: 15px;
-            z-index: 999;
-        }
-        
-        .install-prompt.show {
-            display: flex;
-        }
-        
-        .install-prompt button {
-            background: white;
-            color: #667eea;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body class="light-theme">
-    <!-- 접근성: 스킵 네비게이션 -->
-    <a href="#mainContainer" class="skip-link">메인 콘텐츠로 바로가기</a>
-    
     <div class="container">
         <div class="header">
             <h1>🎰 우리 가족 자판기 만들기 v2.0</h1>
@@ -227,7 +203,7 @@
         <div class="tab-container" id="mainContainer">
             <button class="help-button" onclick="VendingMachineApp.showHelp()" title="도움말" aria-label="도움말 보기">?</button>
             
-            <div class="tabs" role="tablist">
+            <div class="tabs" role="tablist" aria-label="가족 구성원 선택">
                 <button class="tab-button active" role="tab" aria-selected="true" aria-controls="mom-tab">👩 엄마 자판기</button>
                 <button class="tab-button" role="tab" aria-selected="false" aria-controls="dad-tab">👨 아빠 자판기</button>
                 <button class="tab-button" role="tab" aria-selected="false" aria-controls="daughter-tab">👧 딸 자판기</button>
@@ -235,7 +211,7 @@
             </div>
             
             <!-- 엄마 자판기 -->
-            <div id="mom-tab" class="tab-content active" role="tabpanel">
+            <div id="mom-tab" class="tab-content active" role="tabpanel" aria-labelledby="mom-tab-button">
                 <div class="vending-machine" id="mom-machine">
                     <div class="machine-header">
                         <h2>엄마 자판기</h2>
@@ -245,9 +221,8 @@
                                    class="name-input" 
                                    data-role="mom" 
                                    maxlength="20"
-                                   aria-label="엄마 이름 입력"
-                                   aria-describedby="mom-counter">
-                            <span class="char-counter" id="mom-counter" aria-live="polite">0/20</span>
+                                   aria-label="엄마 이름 입력">
+                            <span class="char-counter" aria-live="polite">0/20</span>
                         </div>
                     </div>
                     <div class="button-controls">
@@ -255,12 +230,12 @@
                         <button class="control-btn example-button" aria-label="예시 보기">💡 예시 보기</button>
                         <button class="control-btn clear-button" aria-label="전체 삭제">🗑️ 전체 삭제</button>
                     </div>
-                    <div class="buttons-grid" id="mom-buttons" role="group" aria-label="엄마 자판기 버튼들"></div>
+                    <div class="buttons-grid" id="mom-buttons"></div>
                 </div>
             </div>
             
             <!-- 아빠 자판기 -->
-            <div id="dad-tab" class="tab-content" role="tabpanel">
+            <div id="dad-tab" class="tab-content" role="tabpanel" aria-labelledby="dad-tab-button">
                 <div class="vending-machine" id="dad-machine">
                     <div class="machine-header">
                         <h2>아빠 자판기</h2>
@@ -270,9 +245,8 @@
                                    class="name-input" 
                                    data-role="dad" 
                                    maxlength="20"
-                                   aria-label="아빠 이름 입력"
-                                   aria-describedby="dad-counter">
-                            <span class="char-counter" id="dad-counter" aria-live="polite">0/20</span>
+                                   aria-label="아빠 이름 입력">
+                            <span class="char-counter" aria-live="polite">0/20</span>
                         </div>
                     </div>
                     <div class="button-controls">
@@ -280,12 +254,12 @@
                         <button class="control-btn example-button" aria-label="예시 보기">💡 예시 보기</button>
                         <button class="control-btn clear-button" aria-label="전체 삭제">🗑️ 전체 삭제</button>
                     </div>
-                    <div class="buttons-grid" id="dad-buttons" role="group" aria-label="아빠 자판기 버튼들"></div>
+                    <div class="buttons-grid" id="dad-buttons"></div>
                 </div>
             </div>
             
             <!-- 딸 자판기 -->
-            <div id="daughter-tab" class="tab-content" role="tabpanel">
+            <div id="daughter-tab" class="tab-content" role="tabpanel" aria-labelledby="daughter-tab-button">
                 <div class="vending-machine" id="daughter-machine">
                     <div class="machine-header">
                         <h2>딸 자판기</h2>
@@ -295,9 +269,8 @@
                                    class="name-input" 
                                    data-role="daughter" 
                                    maxlength="20"
-                                   aria-label="딸 이름 입력"
-                                   aria-describedby="daughter-counter">
-                            <span class="char-counter" id="daughter-counter" aria-live="polite">0/20</span>
+                                   aria-label="딸 이름 입력">
+                            <span class="char-counter" aria-live="polite">0/20</span>
                         </div>
                     </div>
                     <div class="button-controls">
@@ -305,12 +278,12 @@
                         <button class="control-btn example-button" aria-label="예시 보기">💡 예시 보기</button>
                         <button class="control-btn clear-button" aria-label="전체 삭제">🗑️ 전체 삭제</button>
                     </div>
-                    <div class="buttons-grid" id="daughter-buttons" role="group" aria-label="딸 자판기 버튼들"></div>
+                    <div class="buttons-grid" id="daughter-buttons"></div>
                 </div>
             </div>
             
             <!-- 아들 자판기 -->
-            <div id="son-tab" class="tab-content" role="tabpanel">
+            <div id="son-tab" class="tab-content" role="tabpanel" aria-labelledby="son-tab-button">
                 <div class="vending-machine" id="son-machine">
                     <div class="machine-header">
                         <h2>아들 자판기</h2>
@@ -320,9 +293,8 @@
                                    class="name-input" 
                                    data-role="son" 
                                    maxlength="20"
-                                   aria-label="아들 이름 입력"
-                                   aria-describedby="son-counter">
-                            <span class="char-counter" id="son-counter" aria-live="polite">0/20</span>
+                                   aria-label="아들 이름 입력">
+                            <span class="char-counter" aria-live="polite">0/20</span>
                         </div>
                     </div>
                     <div class="button-controls">
@@ -330,7 +302,7 @@
                         <button class="control-btn example-button" aria-label="예시 보기">💡 예시 보기</button>
                         <button class="control-btn clear-button" aria-label="전체 삭제">🗑️ 전체 삭제</button>
                     </div>
-                    <div class="buttons-grid" id="son-buttons" role="group" aria-label="아들 자판기 버튼들"></div>
+                    <div class="buttons-grid" id="son-buttons"></div>
                 </div>
             </div>
             
@@ -349,19 +321,22 @@
         </div>
     </div>
     
-    <!-- PWA 설치 프롬프트 -->
-    <div class="install-prompt" id="installPrompt">
-        <span>📱 앱으로 설치하시겠습니까?</span>
-        <button onclick="installPWA()">설치</button>
-        <button onclick="dismissInstall()">나중에</button>
-    </div>
-    
     <!-- 이모지 선택기 -->
     <div class="emoji-picker" id="emojiPicker" role="dialog" aria-label="이모지 선택"></div>
     
     <!-- 로딩 스피너 -->
     <div class="loading-spinner" id="loadingSpinner" role="status" aria-label="로딩 중">
         <div class="spinner"></div>
+    </div>
+    
+    <!-- PWA 설치 프롬프트 -->
+    <div class="pwa-install-prompt" id="pwaPrompt">
+        <h3>🎰 앱 설치</h3>
+        <p>홈 화면에 추가하여 더 빠르고 편리하게 사용하세요!</p>
+        <div class="pwa-install-buttons">
+            <button class="pwa-install-button install" id="pwaInstall">설치</button>
+            <button class="pwa-install-button later" id="pwaLater">나중에</button>
+        </div>
     </div>
     
     <!-- JavaScript 파일 -->
@@ -371,12 +346,12 @@
     <script src="js/vending-machine.js"></script>
     <script src="js/app.js"></script>
     
-    <!-- PWA 서비스 워커 등록 -->
+    <!-- PWA 등록 -->
     <script>
-        // 서비스 워커 등록
+        // Service Worker 등록
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
+                navigator.serviceWorker.register('service-worker.js')
                     .then(registration => {
                         console.log('ServiceWorker registration successful');
                         
@@ -387,54 +362,54 @@
                                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                                     // 새 버전 알림
                                     if (confirm('새로운 버전이 있습니다. 업데이트하시겠습니까?')) {
-                                        newWorker.postMessage({ action: 'skipWaiting' });
+                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
                                         window.location.reload();
                                     }
                                 }
                             });
                         });
                     })
-                    .catch(err => console.log('ServiceWorker registration failed:', err));
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
             });
         }
         
         // PWA 설치 프롬프트
         let deferredPrompt;
+        const pwaPrompt = document.getElementById('pwaPrompt');
+        const installBtn = document.getElementById('pwaInstall');
+        const laterBtn = document.getElementById('pwaLater');
+        
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             
-            // 설치 프롬프트 표시
-            const installPrompt = document.getElementById('installPrompt');
-            if (installPrompt) {
-                installPrompt.classList.add('show');
-            }
+            // 프롬프트 표시
+            setTimeout(() => {
+                pwaPrompt.classList.add('show');
+            }, 3000);
         });
         
-        function installPWA() {
-            const installPrompt = document.getElementById('installPrompt');
-            installPrompt.classList.remove('show');
-            
+        installBtn?.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    }
-                    deferredPrompt = null;
-                });
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                deferredPrompt = null;
             }
-        }
+            pwaPrompt.classList.remove('show');
+        });
         
-        function dismissInstall() {
-            const installPrompt = document.getElementById('installPrompt');
-            installPrompt.classList.remove('show');
-        }
+        laterBtn?.addEventListener('click', () => {
+            pwaPrompt.classList.remove('show');
+        });
         
-        // iOS PWA 감지
-        if (window.navigator.standalone === true) {
-            console.log('Running as iOS PWA');
-        }
+        // 설치 성공 감지
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            deferredPrompt = null;
+        });
     </script>
 </body>
 </html>

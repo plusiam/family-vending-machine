@@ -1,67 +1,130 @@
 {
-    "name": "우리 가족 자판기 만들기",
-    "short_name": "가족자판기",
-    "description": "《엄마 자판기》 그림책 연계 교육 활동 - 우리 가족만의 특별한 자판기를 만들어보세요!",
-    "lang": "ko-KR",
-    "start_url": "/",
-    "display": "standalone",
-    "orientation": "any",
-    "theme_color": "#667eea",
-    "background_color": "#ffffff",
-    "icons": [
+  "name": "우리 가족 자판기 만들기",
+  "short_name": "가족자판기",
+  "description": "《엄마 자판기》 그림책 연계 교육 활동 - 가족이 좋아하는 것들로 자판기를 만들어보세요",
+  "start_url": "/family-vending-machine/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/family-vending-machine/",
+  "lang": "ko-KR",
+  "dir": "ltr",
+  "categories": ["education", "kids", "lifestyle"],
+  "icons": [
+    {
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "메인 화면"
+    },
+    {
+      "src": "screenshots/screenshot2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "자판기 만들기"
+    },
+    {
+      "src": "screenshots/screenshot3.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "이모지 선택"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "새 자판기 만들기",
+      "short_name": "새로만들기",
+      "description": "새로운 가족 자판기 만들기",
+      "url": "/family-vending-machine/?action=new",
+      "icons": [
         {
-            "src": "icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
+          "src": "icons/new-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
         }
-    ],
-    "categories": [
-        "education",
-        "kids",
-        "games"
-    ],
-    "screenshots": [
+      ]
+    },
+    {
+      "name": "내 자판기 보기",
+      "short_name": "보기",
+      "description": "저장된 자판기 보기",
+      "url": "/family-vending-machine/?action=view",
+      "icons": [
         {
-            "src": "screenshot1.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "label": "메인 화면"
-        },
-        {
-            "src": "screenshot2.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "label": "자판기 만들기"
+          "src": "icons/view-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
         }
-    ],
-    "shortcuts": [
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "share_target": {
+    "action": "/family-vending-machine/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
         {
-            "name": "새 자판기 만들기",
-            "url": "/",
-            "description": "새로운 가족 자판기 만들기"
-        },
-        {
-            "name": "도움말",
-            "url": "/?help=true",
-            "description": "사용 방법 보기"
+          "name": "file",
+          "accept": ["image/*", "application/json"]
         }
-    ],
-    "features": [
-        "가족 구성원별 맞춤 자판기",
-        "드래그 앤 드롭 버튼 정렬",
-        "자동 저장 기능",
-        "이미지 캡처 및 공유",
-        "오프라인 사용 가능"
-    ],
-    "prefer_related_applications": false,
-    "dir": "ltr",
-    "scope": "/",
-    "iarc_rating_id": "e3plus"
+      ]
+    }
+  }
 }
