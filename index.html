@@ -46,6 +46,8 @@
             color: white;
             margin-bottom: 30px;
             animation: fadeInDown 0.8s ease;
+            position: relative;
+            z-index: 10;
         }
         
         .header h1 {
@@ -110,7 +112,7 @@
             cursor: pointer;
             font-size: 1.2em;
             transition: all 0.3s ease;
-            z-index: 10;
+            z-index: 20;
         }
         
         .help-button:hover {
@@ -124,6 +126,8 @@
             margin-bottom: 30px;
             flex-wrap: wrap;
             justify-content: center;
+            position: relative;
+            z-index: 15;
         }
         
         .tab-button {
@@ -171,43 +175,46 @@
         .machine-header {
             background: linear-gradient(135deg, #FF6B6B, #FF8E53);
             color: white;
-            padding: 20px;
+            padding: 25px 20px;
             border-radius: 15px;
             text-align: center;
             margin-bottom: 25px;
             position: relative;
-            overflow: hidden;
+            z-index: 5;
         }
         
         .machine-header h2 {
             font-size: 1.8em;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
             position: relative;
         }
         
         .machine-header input {
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.95);
             border: none;
-            padding: 8px 15px;
+            padding: 10px 20px;
             border-radius: 20px;
             font-size: 1.1em;
-            margin-top: 10px;
-            width: 60%;
+            width: 70%;
+            max-width: 300px;
             text-align: center;
             position: relative;
             color: #333;
+            z-index: 1;
         }
         
         .button-controls {
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 5;
         }
         
         .control-btn {
-            padding: 8px 20px;
+            padding: 10px 20px;
             border: 2px solid #667eea;
             background: white;
             color: #667eea;
@@ -215,6 +222,7 @@
             cursor: pointer;
             font-size: 1em;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
         
         .control-btn:hover {
@@ -225,26 +233,34 @@
         
         .buttons-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             margin-bottom: 25px;
             min-height: 200px;
+            position: relative;
+        }
+        
+        @media (max-width: 480px) {
+            .buttons-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
         .vending-button {
             background: linear-gradient(145deg, #f0f0f0, #ffffff);
             border: 2px solid #e0e0e0;
             border-radius: 15px;
-            padding: 15px;
-            min-height: 120px;
+            padding: 20px 10px;
+            min-height: 140px;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 10px;
         }
         
         .vending-button:hover {
@@ -261,26 +277,32 @@
         
         .button-number {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 8px;
+            right: 8px;
             background: rgba(0,0,0,0.1);
-            width: 25px;
-            height: 25px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.9em;
+            font-size: 0.85em;
+            z-index: 2;
+        }
+        
+        .vending-button.filled .button-number {
+            background: rgba(255,255,255,0.2);
         }
         
         .button-emoji {
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-size: 2.5em;
             display: block;
             text-align: center;
             cursor: pointer;
             transition: transform 0.3s ease;
+            line-height: 1;
+            margin-top: 5px;
         }
         
         .button-emoji:hover {
@@ -293,6 +315,7 @@
             word-break: keep-all;
             line-height: 1.3;
             width: 100%;
+            margin-top: 5px;
         }
         
         .button-input {
@@ -304,6 +327,7 @@
             color: inherit;
             outline: none;
             font-weight: 500;
+            padding: 5px;
         }
         
         .button-input::placeholder {
@@ -316,19 +340,20 @@
         
         .button-delete {
             position: absolute;
-            top: 5px;
-            left: 5px;
-            width: 20px;
-            height: 20px;
+            top: 8px;
+            left: 8px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            background: rgba(244, 67, 54, 0.8);
+            background: rgba(244, 67, 54, 0.9);
             color: white;
             border: none;
             cursor: pointer;
-            font-size: 0.8em;
+            font-size: 0.75em;
             display: none;
             align-items: center;
             justify-content: center;
+            z-index: 3;
         }
         
         .vending-button:hover .button-delete {
@@ -526,133 +551,6 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* 인쇄 스타일 개선 */
-        @media print {
-            @page {
-                size: A4;
-                margin: 10mm;
-            }
-            
-            body {
-                background: white !important;
-                padding: 0;
-            }
-            
-            .container {
-                max-width: 100%;
-            }
-            
-            .header {
-                color: black !important;
-                page-break-after: avoid;
-                margin-bottom: 20px;
-            }
-            
-            .header h1 {
-                font-size: 1.8em;
-                color: #333 !important;
-            }
-            
-            .header p {
-                color: #666 !important;
-            }
-            
-            .actions,
-            .tabs,
-            .theme-selector,
-            .help-button,
-            .button-controls,
-            .button-delete,
-            .capture-modal,
-            .saved-message {
-                display: none !important;
-            }
-            
-            .tab-container {
-                box-shadow: none;
-                padding: 0;
-            }
-            
-            /* 모든 탭을 한 페이지에 표시 */
-            .tab-content {
-                display: block !important;
-                page-break-inside: avoid;
-                margin-bottom: 15px;
-            }
-            
-            .vending-machine {
-                box-shadow: none;
-                border: 2px solid #333;
-                padding: 15px;
-                margin: 10px auto;
-                max-width: 45%;
-                display: inline-block;
-                vertical-align: top;
-                page-break-inside: avoid;
-            }
-            
-            .machine-header {
-                background: #f0f0f0 !important;
-                color: #333 !important;
-                padding: 10px;
-                print-color-adjust: exact;
-                -webkit-print-color-adjust: exact;
-            }
-            
-            .machine-header h2 {
-                font-size: 1.3em;
-                color: #333 !important;
-            }
-            
-            .machine-header input {
-                color: #333 !important;
-                font-weight: bold;
-                border: 1px solid #ddd;
-            }
-            
-            .buttons-grid {
-                min-height: auto;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-            }
-            
-            .vending-button {
-                min-height: 80px;
-                padding: 8px;
-                page-break-inside: avoid;
-            }
-            
-            .vending-button.filled {
-                background: #667eea !important;
-                print-color-adjust: exact;
-                -webkit-print-color-adjust: exact;
-            }
-            
-            .button-emoji {
-                font-size: 1.5em;
-            }
-            
-            .button-input {
-                font-size: 0.8em;
-            }
-            
-            /* 2x2 그리드 레이아웃 */
-            #mom-tab .vending-machine,
-            #dad-tab .vending-machine {
-                margin-bottom: 10px;
-            }
-            
-            /* 인쇄 날짜 표시 */
-            .tab-container::after {
-                content: "인쇄일: " attr(data-date);
-                display: block;
-                text-align: center;
-                margin-top: 20px;
-                font-size: 0.9em;
-                color: #666;
-            }
-        }
-        
         @keyframes fadeInDown {
             from {
                 opacity: 0;
@@ -700,8 +598,43 @@
                 font-size: 1.8em;
             }
             
+            .header p {
+                font-size: 1em;
+            }
+            
+            .vending-machine {
+                padding: 20px;
+            }
+            
+            .machine-header {
+                padding: 15px;
+            }
+            
+            .machine-header h2 {
+                font-size: 1.5em;
+            }
+            
             .buttons-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .vending-button {
+                min-height: 120px;
+                padding: 15px 8px;
+            }
+            
+            .button-emoji {
+                font-size: 2em;
+            }
+            
+            .button-input {
+                font-size: 0.85em;
+            }
+            
+            .control-btn {
+                padding: 8px 15px;
+                font-size: 0.9em;
             }
             
             .actions {
