@@ -1,81 +1,118 @@
-# 기여 가이드
+# 기여 가이드라인 🤝
 
-우리 가족 자판기 프로젝트에 기여해주셔서 감사합니다! 🎉
+우리 가족 자판기 프로젝트에 기여해주셔서 감사합니다!
 
-## 🤝 기여 방법
+## 📢 행동 강령
 
-### 1. 이슈 보고
+이 프로젝트는 교육용 프로젝트로, 모든 참여자는 다음을 준수해야 합니다:
 
-버그를 발견하거나 개선 사항이 있다면 [이슈](https://github.com/plusiam/family-vending-machine/issues)를 생성해주세요.
+- 타인을 존중하고 친절하게 대하기
+- 건설적인 피드백 제공
+- 아이들이 사용하기 안전한 콘텐츠 유지
 
-#### 좋은 이슈의 예:
-- **버그 보고**: 재현 방법, 예상 동작, 실제 동작을 포함
-- **기능 제안**: 명확한 설명과 사용 예시
-- **개선 사항**: 개선이 필요한 이유와 방법
+## 🎯 기여 방법
 
-### 2. Pull Request
+### 1. 버그 신고
 
-1. **Fork** 저장소를 Fork합니다
-2. **브랜치 생성** (`git checkout -b feature/AmazingFeature`)
-3. **커밋** 변경사항을 커밋합니다 (`git commit -m 'Add some AmazingFeature'`)
-4. **푸시** 브랜치에 푸시합니다 (`git push origin feature/AmazingFeature`)
-5. **Pull Request** 생성
+버그를 발견하셨나요? GitHub Issues에 등록해주세요:
 
-### 3. 코드 스타일 가이드
+1. 버그가 이미 등록되어 있는지 확인
+2. 새 Issue 생성
+3. 다음 정보 포함:
+   - 버그 설명
+   - 재현 방법
+   - 예상 동작
+   - 실제 동작
+   - 브라우저 및 버전 정보
 
-#### JavaScript
+### 2. 기능 제안
+
+새로운 기능 아이디어가 있으신가요?
+
+1. Issues에 "기능 제안" 레이블로 등록
+2. 다음 내용 포함:
+   - 기능 설명
+   - 필요한 이유
+   - 구현 방법 제안 (선택사항)
+
+### 3. 코드 기여
+
+#### 준비 사항
+
+```bash
+# 저장소 Fork
+# GitHub에서 Fork 버튼 클릭
+
+# 로컬에 클론
+git clone https://github.com/[your-username]/family-vending-machine.git
+cd family-vending-machine
+
+# 원본 저장소를 upstream으로 추가
+git remote add upstream https://github.com/plusiam/family-vending-machine.git
+
+# 새 브랜치 생성
+git checkout -b feature/your-feature-name
+```
+
+#### 코드 스타일 가이드
+
+**JavaScript**
 ```javascript
 // 함수는 camelCase 사용
 function addVendingButton() {
-    // 4 스페이스 들여쓰기
+    // 들여쓰기: 4칸 스페이스
     const button = document.createElement('div');
     
-    // 의미 있는 변수명 사용
-    const buttonText = 'Click me';
-    
-    // 주석은 한국어 또는 영어로 명확하게
-    // 복잡한 로직은 설명 추가
+    // 주석은 명확하게
+    // TODO: 미완성 기능 표시
 }
 
-// 클래스는 PascalCase 사용
+// 클래스는 PascalCase
 class VendingMachine {
     constructor() {
         // ...
     }
 }
+
+// 상수는 UPPER_SNAKE_CASE
+const MAX_BUTTONS = 12;
 ```
 
-#### CSS
+**CSS**
 ```css
 /* BEM 명명 규칙 사용 */
 .vending-machine {
-    /* 속성은 알파벳 순서로 */
+    /* 속성 순서: 레이아웃 > 스타일 > 기타 */
+    display: flex;
     background: white;
-    border-radius: 10px;
-    padding: 20px;
+    transition: all 0.3s ease;
 }
 
 .vending-machine__button {
-    /* 컨텍스트를 명확히 */
+    /* 컴포넌트 */
 }
 
 .vending-machine__button--active {
-    /* 상태 표현은 -- 사용 */
+    /* 상태 변형 */
 }
 ```
 
-#### HTML
+**HTML**
 ```html
 <!-- 시맨틱 HTML 사용 -->
 <section class="vending-machine">
-    <!-- 접근성을 위한 ARIA 레이블 -->
-    <button aria-label="버튼 추가">
+    <header class="machine-header">
+        <h2>엄마 자판기</h2>
+    </header>
+    
+    <!-- 접근성 속성 포함 -->
+    <button aria-label="버튼 추가" role="button">
         ➕ 추가
     </button>
 </section>
 ```
 
-### 4. 커밋 메시지 규칙
+#### 커밋 메시지 규칙
 
 ```
 <type>: <subject>
@@ -85,93 +122,77 @@ class VendingMachine {
 <footer>
 ```
 
-#### Type
-- **feat**: 새로운 기능
-- **fix**: 버그 수정
-- **docs**: 문서 변경
-- **style**: 코드 형식 변경 (세미콜론, 공백 등)
-- **refactor**: 코드 리팩토링
-- **test**: 테스트 추가/수정
-- **chore**: 빌드 프로세스 또는 보조 도구 변경
+**Type:**
+- `feat`: 새로운 기능
+- `fix`: 버그 수정
+- `docs`: 문서 변경
+- `style`: 코드 스타일 변경
+- `refactor`: 코드 리팩토링
+- `test`: 테스트 추가/수정
+- `chore`: 빌드, 패키지 등
 
-#### 예시
+**예시:**
 ```
-feat: 다국어 지원 추가
+feat: QR 코드 공유 기능 추가
 
-한국어와 영어를 지원하는 i18n 모듈을 추가했습니다.
-사용자가 언어를 선택할 수 있는 UI를 구현했습니다.
-
+- QR 코드 생성 API 연동
+- 공유 링크 생성 및 복사
+- 카카오톡, WhatsApp 공유 지원
 
 Resolves: #123
 ```
 
-### 5. 테스트
+### 4. Pull Request
 
-새로운 기능을 추가할 때는 테스트를 포함해주세요:
-
-```javascript
-// 예시 테스트
-function testVendingMachine() {
-    const machine = new VendingMachine('mom');
-    console.assert(machine.role === 'mom', 'Role should be mom');
-    console.assert(machine.buttons.length === 0, 'Initial buttons should be empty');
-    console.log('✅ All tests passed!');
-}
+1. 변경사항 푸시
+```bash
+git push origin feature/your-feature-name
 ```
 
-### 6. 문서화
+2. GitHub에서 Pull Request 생성
 
-- 모든 함수와 클래스에 JSDoc 주석 추가
-- README.md 업데이트 (필요시)
-- 변경사항을 CHANGELOG.md에 기록
+3. PR 템플릿 작성:
+```markdown
+## 📝 변경 사항
+- 무엇을 변경했는지 설명
 
-### 7. 라이선스
+## 🎯 관련 이슈
+- Fixes #(issue number)
+
+## 📋 체크리스트
+- [ ] 코드 스타일 가이드 준수
+- [ ] 테스트 통과
+- [ ] 문서 업데이트
+- [ ] 모바일 호환성 확인
+
+## 📸 스크린샷
+(필요한 경우)
+```
+
+## 🧪 테스트
+
+### 로컬 테스트
+
+```bash
+# 웹 서버 실행
+python -m http.server 8000
+
+# 브라우저에서 테스트
+# http://localhost:8000
+```
+
+### 테스트 항목
+
+- [ ] 기본 기능 동작
+- [ ] 다양한 브라우저 호환성
+- [ ] 모바일 반응형 디자인
+- [ ] 오프라인 모드
+- [ ] 인쇄 기능
+
+## 📄 라이선스
 
 기여하신 코드는 MIT 라이선스를 따릅니다.
 
-## 📝 체크리스트
+## 🙏 감사합니다!
 
-Pull Request를 제출하기 전에 확인해주세요:
-
-- [ ] 코드가 기존 스타일 가이드를 따르나요?
-- [ ] 변경사항이 기존 기능을 깨트리지 않나요?
-- [ ] 테스트를 추가/업데이트 했나요?
-- [ ] 문서를 업데이트 했나요?
-- [ ] 커밋 메시지가 규칙을 따르나요?
-
-## 🌐 번역 기여
-
-새로운 언어 지원을 추가하려면:
-
-1. `js/i18n.js` 파일에 새 언어 추가
-2. 모든 키에 대한 번역 제공
-3. README.md에 지원 언어 업데이트
-
-## 🐛 버그 보고
-
-버그를 보고할 때 포함해주세요:
-
-- 브라우저 및 버전
-- 운영체제
-- 재현 단계
-- 예상 동작
-- 실제 동작
-- 스크린샷 (가능한 경우)
-
-## 🚀 기능 제안
-
-새로운 기능을 제안할 때:
-
-1. 먼저 이슈를 생성하여 토론
-2. 사용 사례와 예시 포함
-3. 기존 기능과의 호환성 고려
-4. 성능 영향 분석
-
-## 🤔 질문이 있나요?
-
-- [이슈](https://github.com/plusiam/family-vending-machine/issues)에 질문하기
-- 이메일: yeohanki@naver.com
-
-## 🎆 감사합니다!
-
-여러분의 기여가 이 프로젝트를 더 나은 교육 도구로 만들어줍니다. 함께 해주셔서 감사합니다! 😊
+모든 기여는 프로젝트를 더 나은 교육 도구로 만드는 데 도움이 됩니다. 함께 해주셔서 감사합니다! 💜
