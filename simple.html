@@ -238,6 +238,12 @@
         .modal-header h2 {
             color: #333;
             font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .selected-emoji-display {
+            font-size: 3rem;
+            margin: 10px 0;
         }
 
         .emoji-grid {
@@ -258,12 +264,25 @@
         }
 
         .emoji-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.1);
+        }
+
+        .emoji-btn.selected {
             background: #667eea;
+            border-color: #5a67d8;
             transform: scale(1.1);
         }
 
         .text-input-section {
             margin-top: 20px;
+        }
+
+        .text-input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 0.9rem;
         }
 
         .text-input {
@@ -273,6 +292,11 @@
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             margin-bottom: 15px;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
         .modal-buttons {
@@ -295,9 +319,17 @@
             color: white;
         }
 
+        .modal-confirm:hover {
+            background: #5a67d8;
+        }
+
         .modal-cancel {
             background: #e0e0e0;
             color: #333;
+        }
+
+        .modal-cancel:hover {
+            background: #d0d0d0;
         }
 
         @media (max-width: 480px) {
@@ -350,6 +382,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>버튼 만들기</h2>
+                <div class="selected-emoji-display" id="selectedEmojiDisplay">🎨</div>
             </div>
             
             <div class="emoji-grid" id="emojiGrid">
@@ -357,8 +390,9 @@
             </div>
 
             <div class="text-input-section">
+                <label class="text-input-label">버튼에 표시할 텍스트를 입력하세요</label>
                 <input type="text" class="text-input" id="textInput" 
-                       placeholder="버튼에 표시할 텍스트를 입력하세요" maxlength="10">
+                       placeholder="예: 그림 만들기" maxlength="10">
             </div>
 
             <div class="modal-buttons">
@@ -380,6 +414,7 @@
         // 현재 선택된 탭
         let currentType = 'mom';
         let editingIndex = null;
+        let selectedEmoji = '🎨';
 
         // 이모지 목록
         const emojis = [
@@ -387,7 +422,7 @@
             '📚', '🌈', '☕', '🎵', '🏃', '🍕',
             '📱', '💻', '🎂', '🌸', '⚽', '🎸',
             '📷', '✈️', '🍜', '🎯', '🎪', '🌙',
-            '🍰', '🎭', '🏀', '🎨', '🌺', '🎪'
+            '🍰', '🎭', '🏀', '🚗', '🌺', '🎁'
         ];
 
         // 예시 데이터
@@ -484,7 +519,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'emoji-btn';
                 btn.textContent = emoji;
-                btn.onclick = () => selectEmoji(emoji);
+                btn.onclick = (e) => selectEmoji(emoji, e);
                 grid.appendChild(btn);
             });
         }
@@ -523,6 +558,7 @@
                 return;
             }
             editingIndex = items.length;
+            selectedEmoji = '🎨'; // 기본 이모지로 초기화
             openModal();
         }
 
@@ -531,6 +567,7 @@
             editingIndex = index;
             const item = vendingData[currentType].items[index];
             if (item) {
+                selectedEmoji = item.emoji;
                 document.getElementById('textInput').value = item.text;
                 openModal();
             }
@@ -539,27 +576,51 @@
         // 모달 열기
         function openModal() {
             document.getElementById('modal').classList.add('active');
-            document.getElementById('textInput').value = '';
-            document.getElementById('textInput').focus();
+            document.getElementById('selectedEmojiDisplay').textContent = selectedEmoji;
+            
+            // 이전 선택 초기화
+            document.querySelectorAll('.emoji-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.textContent === selectedEmoji) {
+                    btn.classList.add('selected');
+                }
+            });
+            
+            // 편집 모드가 아닌 경우 텍스트 필드 초기화
+            if (editingIndex >= vendingData[currentType].items.length) {
+                document.getElementById('textInput').value = '';
+            }
+            
+            // 텍스트 입력 필드에 포커스
+            setTimeout(() => {
+                document.getElementById('textInput').focus();
+            }, 100);
         }
 
         // 모달 닫기
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
             editingIndex = null;
+            selectedEmoji = '🎨';
         }
 
         // 이모지 선택
-        let selectedEmoji = '🎨';
-        function selectEmoji(emoji) {
+        function selectEmoji(emoji, event) {
             selectedEmoji = emoji;
-            // 시각적 피드백
-            event.target.style.background = '#667eea';
-            event.target.style.color = 'white';
-            setTimeout(() => {
-                event.target.style.background = '';
-                event.target.style.color = '';
-            }, 200);
+            
+            // 선택된 이모지 표시 업데이트
+            document.getElementById('selectedEmojiDisplay').textContent = emoji;
+            
+            // 모든 버튼에서 selected 클래스 제거
+            document.querySelectorAll('.emoji-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // 현재 버튼에 selected 클래스 추가
+            event.target.classList.add('selected');
+            
+            // 텍스트 입력 필드로 포커스 이동
+            document.getElementById('textInput').focus();
         }
 
         // 아이템 확인
@@ -567,11 +628,16 @@
             const text = document.getElementById('textInput').value.trim();
             if (!text) {
                 alert('텍스트를 입력해주세요.');
+                document.getElementById('textInput').focus();
                 return;
             }
 
             const items = vendingData[currentType].items;
-            items[editingIndex] = { emoji: selectedEmoji, text };
+            
+            // 새 아이템 추가 또는 기존 아이템 수정
+            if (editingIndex !== null) {
+                items[editingIndex] = { emoji: selectedEmoji, text };
+            }
             
             saveToStorage();
             renderGrid();
@@ -613,6 +679,13 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeModal();
+            }
+        });
+
+        // Enter 키로 확인
+        document.getElementById('textInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                confirmItem();
             }
         });
 
