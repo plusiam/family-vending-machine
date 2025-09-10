@@ -1,0 +1,53 @@
+name: Cleanup Project
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "yes" to confirm cleanup'
+        required: true
+        default: 'no'
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'yes'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Remove unnecessary files and folders
+      run: |
+        # 백업 폴더 삭제
+        rm -rf backpup backup
+        
+        # 개발 설정 파일 삭제
+        rm -f .eslintrc.json .prettierrc .editorconfig
+        rm -f CONTRIBUTING.md CHANGELOG.md
+        rm -f reorganize-files.sh
+        
+        # cleanup 관련 파일도 삭제 (자기 자신 포함)
+        rm -f cleanup.sh CLEANUP_GUIDE.md
+        
+        echo "✅ 불필요한 파일 정리 완료"
+        
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A
+        git diff --staged --quiet || git commit -m "cleanup: 불필요한 파일 및 폴더 자동 정리
+        
+        - backpup, backup 폴더 삭제
+        - 개발 설정 파일 삭제
+        - 문서 파일 정리
+        - 스크립트 파일 정리"
+        
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: main
