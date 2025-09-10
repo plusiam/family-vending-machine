@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리 가족 자판기 - 테마 버전</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: background 0.5s ease;
+        }
+
+        /* 배경 테마 */
+        body.theme-purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body.theme-ocean {
+            background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
+        }
+
+        body.theme-sunset {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+        }
+
+        body.theme-forest {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 테마별 컨테이너 스타일 */
+        .theme-purple .container {
+            background: linear-gradient(to bottom, #f8f6ff 0%, white 100%);
+            border: 3px solid #8b5cf6;
+        }
+
+        .theme-ocean .container {
+            background: linear-gradient(to bottom, #e0f2fe 0%, white 100%);
+            border: 3px solid #0ea5e9;
+        }
+
+        .theme-sunset .container {
+            background: linear-gradient(to bottom, #fff5f5 0%, white 100%);
+            border: 3px solid #f97316;
+        }
+
+        .theme-forest .container {
+            background: linear-gradient(to bottom, #f0fdf4 0%, white 100%);
+            border: 3px solid #22c55e;
+        }
+
+        /* 테마별 장식 요소 */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            opacity: 0.1;
+            transition: all 0.5s ease;
+        }
+
+        .theme-purple .container::before {
+            background: radial-gradient(circle, #8b5cf6, transparent);
+        }
+
+        .theme-ocean .container::before {
+            background: radial-gradient(circle, #0ea5e9, transparent);
+        }
+
+        .theme-sunset .container::before {
+            background: radial-gradient(circle, #f97316, transparent);
+        }
+
+        .theme-forest .container::before {
+            background: radial-gradient(circle, #22c55e, transparent);
+        }
+
+        .theme-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-btn.active {
+            border-width: 4px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .theme-btn.purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .theme-btn.ocean {
+            background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
+        }
+
+        .theme-btn.sunset {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+        }
+
+        .theme-btn.forest {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        /* 테마별 헤더 스타일 */
+        .theme-purple .header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .theme-ocean .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            box-shadow: 0 5px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        .theme-sunset .header {
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            box-shadow: 0 5px 20px rgba(249, 115, 22, 0.3);
+        }
+
+        .theme-forest .header {
+            background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+            box-shadow: 0 5px 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .name-input {
+            width: 70%;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 25px;
+            background: white;
+            color: #333;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        /* 테마별 탭 스타일 */
+        .theme-purple .tab.active {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .theme-ocean .tab.active {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .theme-sunset .tab.active {
+            background: #f97316;
+            color: white;
+        }
+
+        .theme-forest .tab.active {
+            background: #22c55e;
+            color: white;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        /* 테마별 버튼 스타일 */
+        .theme-purple .btn-add {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .theme-purple .btn-add:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        .theme-ocean .btn-add {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .theme-ocean .btn-add:hover {
+            background: #0284c7;
+            transform: translateY(-2px);
+        }
+
+        .theme-sunset .btn-add {
+            background: #f97316;
+            color: white;
+        }
+
+        .theme-sunset .btn-add:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+        }
+
+        .theme-forest .btn-add {
+            background: #22c55e;
+            color: white;
+        }
+
+        .theme-forest .btn-add:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+
+        .btn-example {
+            background: #ffa500;
+            color: white;
+        }
+
+        .btn-example:hover {
+            background: #ff8c00;
+            transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .vending-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            min-height: 400px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            transition: all 0.5s ease;
+        }
+
+        /* 테마별 그리드 스타일 */
+        .theme-purple .vending-grid {
+            background: linear-gradient(135deg, #f3e7fc 0%, #ede9fe 100%);
+            box-shadow: inset 0 2px 10px rgba(139, 92, 246, 0.1);
+        }
+
+        .theme-ocean .vending-grid {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            box-shadow: inset 0 2px 10px rgba(14, 165, 233, 0.1);
+        }
+
+        .theme-sunset .vending-grid {
+            background: linear-gradient(135deg, #fed7aa 0%, #ffedd5 100%);
+            box-shadow: inset 0 2px 10px rgba(249, 115, 22, 0.1);
+        }
+
+        .theme-forest .vending-grid {
+            background: linear-gradient(135deg, #bbf7d0 0%, #d9f99d 100%);
+            box-shadow: inset 0 2px 10px rgba(34, 197, 94, 0.1);
+        }
+
+        .vending-item {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #e0e0e0;
+            position: relative;
+        }
+
+        /* 테마별 아이템 스타일 */
+        .theme-purple .vending-item {
+            background: linear-gradient(to bottom, white, #faf5ff);
+            border-color: #e9d5ff;
+        }
+
+        .theme-purple .vending-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+        }
+
+        .theme-ocean .vending-item {
+            background: linear-gradient(to bottom, white, #f0f9ff);
+            border-color: #bfdbfe;
+        }
+
+        .theme-ocean .vending-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.2);
+            border-color: #0ea5e9;
+        }
+
+        .theme-sunset .vending-item {
+            background: linear-gradient(to bottom, white, #fff7ed);
+            border-color: #fed7aa;
+        }
+
+        .theme-sunset .vending-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(249, 115, 22, 0.2);
+            border-color: #f97316;
+        }
+
+        .theme-forest .vending-item {
+            background: linear-gradient(to bottom, white, #f0fdf4);
+            border-color: #bbf7d0;
+        }
+
+        .theme-forest .vending-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+        }
+
+        .vending-item.editable {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .vending-item.empty {
+            background: #f5f5f5;
+            border: 2px dashed #d0d0d0;
+            cursor: default;
+        }
+
+        .vending-item.empty:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #d0d0d0;
+        }
+
+        .item-number {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #667eea;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        /* 테마별 번호 스타일 */
+        .theme-purple .item-number {
+            background: #8b5cf6;
+        }
+
+        .theme-ocean .item-number {
+            background: #0ea5e9;
+        }
+
+        .theme-sunset .item-number {
+            background: #f97316;
+        }
+
+        .theme-forest .item-number {
+            background: #22c55e;
+        }
+
+        .edit-hint {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #ffa500;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .vending-item:hover .edit-hint {
+            opacity: 1;
+        }
+
+        .item-emoji {
+            font-size: 2.5rem;
+            line-height: 1;
+        }
+
+        .item-text {
+            font-size: 0.9rem;
+            text-align: center;
+            word-break: keep-all;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* 하단 기능 버튼들 */
+        .bottom-controls {
+            display: flex;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        /* 테마별 경계선 */
+        .theme-purple .bottom-controls {
+            border-top-color: #e9d5ff;
+        }
+
+        .theme-ocean .bottom-controls {
+            border-top-color: #bfdbfe;
+        }
+
+        .theme-sunset .bottom-controls {
+            border-top-color: #fed7aa;
+        }
+
+        .theme-forest .bottom-controls {
+            border-top-color: #bbf7d0;
+        }
+
+        .bottom-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+
+        .btn-capture {
+            background: #00c896;
+            color: white;
+        }
+
+        .btn-capture:hover {
+            background: #00a77a;
+            transform: translateY(-2px);
+        }
+
+        .btn-print {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        /* 캡처용 워터마크 */
+        .watermark {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            color: rgba(0, 0, 0, 0.3);
+            font-style: italic;
+            display: none;
+        }
+
+        .capture-mode .watermark {
+            display: block;
+        }
+
+        /* 알림 메시지 */
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .selected-emoji-display {
+            font-size: 3rem;
+            margin: 10px 0;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .emoji-btn {
+            aspect-ratio: 1;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .emoji-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.1);
+        }
+
+        .emoji-btn.selected {
+            background: #667eea;
+            border-color: #5a67d8;
+            transform: scale(1.1);
+        }
+
+        .text-input-section {
+            margin-top: 20px;
+        }
+
+        .text-input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-confirm {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-confirm:hover {
+            background: #5a67d8;
+        }
+
+        .modal-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .modal-cancel:hover {
+            background: #d0d0d0;
+        }
+
+        .modal-delete {
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .modal-delete:hover {
+            background: #ff5252;
+        }
+
+        /* 인쇄 스타일 */
+        @media print {
+            body {
+                background: white !important;
+            }
+
+            .theme-selector,
+            .controls,
+            .bottom-controls,
+            .edit-hint {
+                display: none !important;
+            }
+
+            .container {
+                box-shadow: none !important;
+                padding: 20px !important;
+            }
+
+            .vending-grid {
+                page-break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .theme-selector {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                top: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .vending-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .emoji-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            .theme-selector {
+                gap: 8px;
+            }
+
+            .theme-btn {
+                width: 35px;
+                height: 35px;
+            }
+
+            .bottom-btn {
+                min-width: 100px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <!-- html2canvas 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body class="theme-purple">
+    <!-- 배경 테마 선택 버튼 -->
+    <div class="theme-selector">
+        <button class="theme-btn purple active" onclick="changeTheme('purple')" title="보라색 테마"></button>
+        <button class="theme-btn ocean" onclick="changeTheme('ocean')" title="바다 테마"></button>
+        <button class="theme-btn sunset" onclick="changeTheme('sunset')" title="노을 테마"></button>
+        <button class="theme-btn forest" onclick="changeTheme('forest')" title="숲 테마"></button>
+    </div>
+
+    <!-- 알림 메시지 -->
+    <div class="notification" id="notification"></div>
+
+    <div class="container" id="mainContainer">
+        <div class="watermark">Family Vending Machine</div>
+        
+        <div class="header">
+            <h1 id="title">엄마 자판기</h1>
+            <input type="text" class="name-input" id="nameInput" placeholder="이름을 입력하세요" maxlength="20">
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-type="mom">👩 엄마</button>
+            <button class="tab" data-type="dad">👨 아빠</button>
+            <button class="tab" data-type="daughter">👧 딸</button>
+            <button class="tab" data-type="son">👦 아들</button>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-add" onclick="addItem()">➕ 버튼 추가</button>
+            <button class="btn btn-example" onclick="loadExample()">💡 예시 보기</button>
+            <button class="btn btn-clear" onclick="clearAll()">🗑️ 전체 삭제</button>
+        </div>
+
+        <div class="vending-grid" id="vendingGrid">
+            <!-- 12개 슬롯 자동 생성 -->
+        </div>
+
+        <!-- 하단 기능 버튼들 -->
+        <div class="bottom-controls">
+            <button class="bottom-btn btn-capture" onclick="captureImage()">📸 이미지 캡처</button>
+            <button class="bottom-btn btn-print" onclick="printPDF()">🖨️ PDF 인쇄</button>
+            <button class="bottom-btn btn-reset" onclick="resetAll()">🔄 전체 초기화</button>
+        </div>
+    </div>
+
+    <!-- 모달 -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">버튼 만들기</h2>
+                <div class="selected-emoji-display" id="selectedEmojiDisplay">🎨</div>
+            </div>
+            
+            <div class="emoji-grid" id="emojiGrid">
+                <!-- 이모지 버튼들 -->
+            </div>
+
+            <div class="text-input-section">
+                <label class="text-input-label">버튼에 표시할 텍스트를 입력하세요</label>
+                <input type="text" class="text-input" id="textInput" 
+                       placeholder="예: 그림 만들기" maxlength="10">
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn modal-confirm" onclick="confirmItem()">확인</button>
+                <button class="modal-btn modal-cancel" onclick="closeModal()">취소</button>
+            </div>
+            
+            <button class="modal-delete" id="deleteBtn" onclick="deleteItem()" style="display: none;">🗑️ 이 버튼 삭제</button>
+        </div>
+    </div>
+
+    <script>
+        // 데이터 저장소
+        const vendingData = {
+            mom: { name: '엄마', items: [] },
+            dad: { name: '아빠', items: [] },
+            daughter: { name: '딸', items: [] },
+            son: { name: '아들', items: [] }
+        };
+
+        // 현재 선택된 탭과 테마
+        let currentType = 'mom';
+        let currentTheme = 'purple';
+        let editingIndex = null;
+        let selectedEmoji = '🎨';
+
+        // 이모지 목록
+        const emojis = [
+            '🎨', '🎮', '🎬', '🍊', '🤗', '🔨',
+            '📚', '🌈', '☕', '🎵', '🏃', '🍕',
+            '📱', '💻', '🎂', '🌸', '⚽', '🎸',
+            '📷', '✈️', '🍜', '🎯', '🎪', '🌙',
+            '🍰', '🎭', '🏀', '🚗', '🌺', '🎁'
+        ];
+
+        // 예시 데이터
+        const examples = {
+            mom: [
+                { emoji: '🎨', text: '그림 만' },
+                { emoji: '🎮', text: '게임 만' },
+                { emoji: '🎬', text: '영화 만' },
+                { emoji: '🍊', text: '귤 만' },
+                { emoji: '🤗', text: '수아자유만' },
+                { emoji: '🔨', text: '만들기 만' },
+                { emoji: '📚', text: '독서 만' },
+                { emoji: '🌈', text: '여행 만' }
+            ],
+            dad: [
+                { emoji: '⚽', text: '축구 만' },
+                { emoji: '🎮', text: '게임 만' },
+                { emoji: '☕', text: '커피 만' },
+                { emoji: '📱', text: '폰 만' },
+                { emoji: '🎵', text: '음악 만' },
+                { emoji: '🏃', text: '운동 만' },
+                { emoji: '🍕', text: '피자 만' },
+                { emoji: '💻', text: '컴퓨터 만' }
+            ],
+            daughter: [
+                { emoji: '🎨', text: '그림 만' },
+                { emoji: '📚', text: '책 만' },
+                { emoji: '🎵', text: '노래 만' },
+                { emoji: '🌸', text: '꽃 만' },
+                { emoji: '🎂', text: '케이크 만' },
+                { emoji: '🌈', text: '무지개 만' },
+                { emoji: '🎮', text: '게임 만' },
+                { emoji: '🍕', text: '피자 만' }
+            ],
+            son: [
+                { emoji: '🎮', text: '게임 만' },
+                { emoji: '⚽', text: '축구 만' },
+                { emoji: '🏀', text: '농구 만' },
+                { emoji: '🍕', text: '피자 만' },
+                { emoji: '🎯', text: '다트 만' },
+                { emoji: '🚗', text: '자동차 만' },
+                { emoji: '🎸', text: '기타 만' },
+                { emoji: '📱', text: '폰 만' }
+            ]
+        };
+
+        // 초기화
+        function init() {
+            loadFromStorage();
+            renderGrid();
+            setupTabs();
+            setupEmojiGrid();
+            updateTitle();
+            
+            // 저장된 테마 불러오기
+            const savedTheme = localStorage.getItem('vendingTheme');
+            if (savedTheme) {
+                changeTheme(savedTheme);
+            }
+        }
+
+        // 알림 메시지 표시
+        function showNotification(message, duration = 3000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+
+        // 테마 변경
+        function changeTheme(theme) {
+            currentTheme = theme;
+            
+            // body 클래스 변경
+            document.body.className = `theme-${theme}`;
+            
+            // 테마 버튼 활성화 상태 변경
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.theme-btn.${theme}`).classList.add('active');
+            
+            // 로컬 스토리지에 저장
+            localStorage.setItem('vendingTheme', theme);
+        }
+
+        // 탭 설정
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelector('.tab.active').classList.remove('active');
+                    tab.classList.add('active');
+                    currentType = tab.dataset.type;
+                    updateTitle();
+                    renderGrid();
+                });
+            });
+
+            // 이름 입력 이벤트
+            document.getElementById('nameInput').addEventListener('input', (e) => {
+                vendingData[currentType].name = e.target.value || getDefaultName(currentType);
+                saveToStorage();
+                updateTitle();
+            });
+        }
+
+        // 제목 업데이트
+        function updateTitle() {
+            const titles = { mom: '엄마', dad: '아빠', daughter: '딸', son: '아들' };
+            const name = vendingData[currentType].name || titles[currentType];
+            document.getElementById('title').textContent = `${name} 자판기`;
+            document.getElementById('nameInput').value = vendingData[currentType].name || '';
+        }
+
+        // 기본 이름 가져오기
+        function getDefaultName(type) {
+            const defaults = { mom: '엄마', dad: '아빠', daughter: '딸', son: '아들' };
+            return defaults[type];
+        }
+
+        // 이모지 그리드 설정
+        function setupEmojiGrid() {
+            const grid = document.getElementById('emojiGrid');
+            emojis.forEach(emoji => {
+                const btn = document.createElement('button');
+                btn.className = 'emoji-btn';
+                btn.textContent = emoji;
+                btn.onclick = (e) => selectEmoji(emoji, e);
+                grid.appendChild(btn);
+            });
+        }
+
+        // 그리드 렌더링
+        function renderGrid(animate = false) {
+            const grid = document.getElementById('vendingGrid');
+            grid.innerHTML = '';
+            
+            // 12개 슬롯 생성 (4x3)
+            for (let i = 0; i < 12; i++) {
+                const item = vendingData[currentType].items[i];
+                const div = document.createElement('div');
+                
+                if (item) {
+                    div.className = animate ? 'vending-item editable' : 'vending-item';
+                    div.innerHTML = `
+                        <span class="edit-hint">수정</span>
+                        <span class="item-number">${i + 1}</span>
+                        <span class="item-emoji">${item.emoji}</span>
+                        <span class="item-text">${item.text}</span>
+                    `;
+                    div.onclick = () => editItem(i);
+                    
+                    // 애니메이션 제거
+                    if (animate) {
+                        setTimeout(() => {
+                            div.classList.remove('editable');
+                        }, 3000);
+                    }
+                } else {
+                    div.className = 'vending-item empty';
+                }
+                
+                grid.appendChild(div);
+            }
+        }
+
+        // 아이템 추가
+        function addItem() {
+            const items = vendingData[currentType].items;
+            if (items.length >= 12) {
+                alert('최대 12개까지만 추가할 수 있습니다.');
+                return;
+            }
+            editingIndex = items.length;
+            selectedEmoji = '🎨'; // 기본 이모지로 초기화
+            openModal(false);
+        }
+
+        // 아이템 편집
+        function editItem(index) {
+            editingIndex = index;
+            const item = vendingData[currentType].items[index];
+            if (item) {
+                selectedEmoji = item.emoji;
+                document.getElementById('textInput').value = item.text;
+                openModal(true);
+            }
+        }
+
+        // 아이템 삭제
+        function deleteItem() {
+            if (editingIndex !== null && editingIndex < vendingData[currentType].items.length) {
+                if (confirm('정말 이 버튼을 삭제하시겠습니까?')) {
+                    vendingData[currentType].items.splice(editingIndex, 1);
+                    saveToStorage();
+                    renderGrid();
+                    closeModal();
+                    showNotification('✅ 버튼이 삭제되었습니다.');
+                }
+            }
+        }
+
+        // 모달 열기
+        function openModal(isEdit = false) {
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('modalTitle').textContent = isEdit ? '버튼 수정하기' : '버튼 만들기';
+            document.getElementById('selectedEmojiDisplay').textContent = selectedEmoji;
+            
+            // 삭제 버튼 표시/숨김
+            document.getElementById('deleteBtn').style.display = isEdit ? 'block' : 'none';
+            
+            // 이전 선택 초기화
+            document.querySelectorAll('.emoji-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.textContent === selectedEmoji) {
+                    btn.classList.add('selected');
+                }
+            });
+            
+            // 편집 모드가 아닌 경우 텍스트 필드 초기화
+            if (!isEdit) {
+                document.getElementById('textInput').value = '';
+            }
+            
+            // 텍스트 입력 필드에 포커스
+            setTimeout(() => {
+                document.getElementById('textInput').focus();
+            }, 100);
+        }
+
+        // 모달 닫기
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            editingIndex = null;
+            selectedEmoji = '🎨';
+        }
+
+        // 이모지 선택
+        function selectEmoji(emoji, event) {
+            selectedEmoji = emoji;
+            
+            // 선택된 이모지 표시 업데이트
+            document.getElementById('selectedEmojiDisplay').textContent = emoji;
+            
+            // 모든 버튼에서 selected 클래스 제거
+            document.querySelectorAll('.emoji-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // 현재 버튼에 selected 클래스 추가
+            event.target.classList.add('selected');
+            
+            // 텍스트 입력 필드로 포커스 이동
+            document.getElementById('textInput').focus();
+        }
+
+        // 아이템 확인
+        function confirmItem() {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) {
+                alert('텍스트를 입력해주세요.');
+                document.getElementById('textInput').focus();
+                return;
+            }
+
+            const items = vendingData[currentType].items;
+            
+            // 새 아이템 추가 또는 기존 아이템 수정
+            if (editingIndex !== null) {
+                items[editingIndex] = { emoji: selectedEmoji, text };
+            }
+            
+            saveToStorage();
+            renderGrid();
+            closeModal();
+        }
+
+        // 예시 불러오기
+        function loadExample() {
+            if (vendingData[currentType].items.length > 0) {
+                if (!confirm('현재 내용을 모두 지우고 예시를 불러올까요?')) {
+                    return;
+                }
+            }
+            
+            vendingData[currentType].items = [...examples[currentType]];
+            saveToStorage();
+            renderGrid(true); // 애니메이션과 함께 렌더링
+            
+            showNotification('💡 예시를 불러왔습니다. 각 버튼을 클릭해서 수정할 수 있어요!');
+        }
+
+        // 전체 삭제 (현재 탭)
+        function clearAll() {
+            if (confirm('정말 모든 버튼을 삭제할까요?')) {
+                vendingData[currentType].items = [];
+                saveToStorage();
+                renderGrid();
+            }
+        }
+
+        // 이미지 캡처 - 배경 포함 버전
+        function captureImage() {
+            const container = document.getElementById('mainContainer');
+            
+            // 캡처 모드 클래스 추가 (워터마크 표시)
+            container.classList.add('capture-mode');
+            
+            // 버튼들 숨기기
+            const controls = document.querySelector('.controls');
+            const bottomControls = document.querySelector('.bottom-controls');
+            const editHints = document.querySelectorAll('.edit-hint');
+            
+            controls.style.display = 'none';
+            bottomControls.style.display = 'none';
+            editHints.forEach(hint => hint.style.display = 'none');
+            
+            // 배경 스타일 가져오기
+            const bodyStyles = window.getComputedStyle(document.body);
+            const backgroundGradient = bodyStyles.backgroundImage;
+            
+            html2canvas(container, {
+                backgroundColor: null,
+                scale: 2,
+                logging: false,
+                onclone: (clonedDoc) => {
+                    // 클론된 문서에 배경 추가
+                    const clonedContainer = clonedDoc.getElementById('mainContainer');
+                    clonedContainer.style.background = backgroundGradient;
+                    clonedContainer.style.padding = '40px';
+                    clonedContainer.style.borderRadius = '20px';
+                }
+            }).then(canvas => {
+                // 캡처 모드 클래스 제거
+                container.classList.remove('capture-mode');
+                
+                // 버튼들 다시 보이기
+                controls.style.display = 'flex';
+                bottomControls.style.display = 'flex';
+                editHints.forEach(hint => hint.style.display = '');
+                
+                // 이미지 다운로드
+                const link = document.createElement('a');
+                const date = new Date().toISOString().slice(0, 10);
+                const name = vendingData[currentType].name || getDefaultName(currentType);
+                const themeNames = {
+                    purple: '보라색',
+                    ocean: '바다',
+                    sunset: '노을', 
+                    forest: '숲'
+                };
+                const themeName = themeNames[currentTheme];
+                link.download = `${name}_자판기_${themeName}_${date}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                
+                showNotification(`📸 ${themeName} 테마 이미지가 저장되었습니다!`);
+            });
+        }
+
+        // PDF 인쇄
+        function printPDF() {
+            window.print();
+        }
+
+        // 전체 초기화
+        function resetAll() {
+            if (confirm('⚠️ 정말 모든 데이터를 초기화하시겠습니까?\n\n엄마, 아빠, 딸, 아들 모든 자판기가 초기화됩니다.')) {
+                if (confirm('정말로 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                    // 모든 데이터 초기화
+                    vendingData.mom = { name: '엄마', items: [] };
+                    vendingData.dad = { name: '아빠', items: [] };
+                    vendingData.daughter = { name: '딸', items: [] };
+                    vendingData.son = { name: '아들', items: [] };
+                    
+                    // 저장 및 다시 렌더링
+                    saveToStorage();
+                    renderGrid();
+                    updateTitle();
+                    
+                    showNotification('✅ 모든 데이터가 초기화되었습니다.');
+                }
+            }
+        }
+
+        // 로컬 스토리지 저장
+        function saveToStorage() {
+            localStorage.setItem('vendingData', JSON.stringify(vendingData));
+        }
+
+        // 로컬 스토리지 불러오기
+        function loadFromStorage() {
+            const saved = localStorage.getItem('vendingData');
+            if (saved) {
+                Object.assign(vendingData, JSON.parse(saved));
+            }
+        }
+
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Enter 키로 확인
+        document.getElementById('textInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                confirmItem();
+            }
+        });
+
+        // 초기화 실행
+        init();
+    </script>
+</body>
+</html>
