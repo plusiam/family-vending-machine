@@ -200,6 +200,7 @@
             padding: 20px;
             background: #f8f9fa;
             border-radius: 15px;
+            margin-bottom: 25px;
         }
 
         .vending-item {
@@ -263,6 +264,61 @@
             word-break: keep-all;
             color: #333;
             font-weight: 500;
+        }
+
+        /* 하단 기능 버튼들 */
+        .bottom-controls {
+            display: flex;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .bottom-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+
+        .btn-capture {
+            background: #00c896;
+            color: white;
+        }
+
+        .btn-capture:hover {
+            background: #00a77a;
+            transform: translateY(-2px);
+        }
+
+        .btn-print {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
         }
 
         .modal {
@@ -394,6 +450,28 @@
             background: #d0d0d0;
         }
 
+        /* 인쇄 스타일 */
+        @media print {
+            body {
+                background: white !important;
+            }
+
+            .theme-selector,
+            .controls,
+            .bottom-controls {
+                display: none !important;
+            }
+
+            .container {
+                box-shadow: none !important;
+                padding: 20px !important;
+            }
+
+            .vending-grid {
+                page-break-inside: avoid;
+            }
+        }
+
         @media (max-width: 768px) {
             .theme-selector {
                 position: fixed;
@@ -429,8 +507,15 @@
                 width: 35px;
                 height: 35px;
             }
+
+            .bottom-btn {
+                min-width: 100px;
+                font-size: 0.9rem;
+            }
         }
     </style>
+    <!-- html2canvas 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body class="theme-purple">
     <!-- 배경 테마 선택 버튼 -->
@@ -441,7 +526,7 @@
         <button class="theme-btn forest" onclick="changeTheme('forest')" title="숲 테마"></button>
     </div>
 
-    <div class="container">
+    <div class="container" id="mainContainer">
         <div class="header">
             <h1 id="title">엄마 자판기</h1>
             <input type="text" class="name-input" id="nameInput" placeholder="이름을 입력하세요" maxlength="20">
@@ -462,6 +547,13 @@
 
         <div class="vending-grid" id="vendingGrid">
             <!-- 12개 슬롯 자동 생성 -->
+        </div>
+
+        <!-- 하단 기능 버튼들 -->
+        <div class="bottom-controls">
+            <button class="bottom-btn btn-capture" onclick="captureImage()">📸 이미지 캡처</button>
+            <button class="bottom-btn btn-print" onclick="printPDF()">🖨️ PDF 인쇄</button>
+            <button class="bottom-btn btn-reset" onclick="resetAll()">🔄 전체 초기화</button>
         </div>
     </div>
 
@@ -765,12 +857,66 @@
             }
         }
 
-        // 전체 삭제
+        // 전체 삭제 (현재 탭)
         function clearAll() {
             if (confirm('정말 모든 버튼을 삭제할까요?')) {
                 vendingData[currentType].items = [];
                 saveToStorage();
                 renderGrid();
+            }
+        }
+
+        // 이미지 캡처
+        function captureImage() {
+            const container = document.getElementById('mainContainer');
+            
+            // 버튼들 숨기기
+            const controls = document.querySelector('.controls');
+            const bottomControls = document.querySelector('.bottom-controls');
+            controls.style.display = 'none';
+            bottomControls.style.display = 'none';
+            
+            html2canvas(container, {
+                backgroundColor: null,
+                scale: 2,
+                logging: false
+            }).then(canvas => {
+                // 버튼들 다시 보이기
+                controls.style.display = 'flex';
+                bottomControls.style.display = 'flex';
+                
+                // 이미지 다운로드
+                const link = document.createElement('a');
+                const date = new Date().toISOString().slice(0, 10);
+                const name = vendingData[currentType].name || getDefaultName(currentType);
+                link.download = `${name}_자판기_${date}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        // PDF 인쇄
+        function printPDF() {
+            window.print();
+        }
+
+        // 전체 초기화
+        function resetAll() {
+            if (confirm('⚠️ 정말 모든 데이터를 초기화하시겠습니까?\n\n엄마, 아빠, 딸, 아들 모든 자판기가 초기화됩니다.')) {
+                if (confirm('정말로 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                    // 모든 데이터 초기화
+                    vendingData.mom = { name: '엄마', items: [] };
+                    vendingData.dad = { name: '아빠', items: [] };
+                    vendingData.daughter = { name: '딸', items: [] };
+                    vendingData.son = { name: '아들', items: [] };
+                    
+                    // 저장 및 다시 렌더링
+                    saveToStorage();
+                    renderGrid();
+                    updateTitle();
+                    
+                    alert('✅ 모든 데이터가 초기화되었습니다.');
+                }
             }
         }
 
