@@ -171,12 +171,14 @@ body {
     display: block;
 }
 
-/* 자판기 */
+/* 자판기 컨테이너 너비 제한 */
 .vending-machine {
     padding: 20px;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     border-radius: var(--border-radius);
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 650px;  /* 자판기 최대 너비 제한 */
+    margin: 0 auto;    /* 중앙 정렬 */
 }
 
 .machine-header {
@@ -261,11 +263,11 @@ body {
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
-/* 버튼 그리드 - 반응형 개선 */
+/* 버튼 그리드 - 4열 고정 */
 .buttons-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: clamp(10px, 2vw, 15px);
+    grid-template-columns: repeat(4, 1fr);  /* 4열 고정 */
+    gap: 12px;
     min-height: 200px;
     padding: 15px;
     background: rgba(255, 255, 255, 0.5);
@@ -274,7 +276,9 @@ body {
 
 /* 자판기 버튼 */
 .vending-button {
-    aspect-ratio: 1;
+    aspect-ratio: 1 / 1;  /* 정사각형 유지 */
+    min-height: 90px;
+    max-height: 130px;
     border: 3px solid #ddd;
     border-radius: 15px;
     display: flex;
@@ -319,8 +323,8 @@ body {
 }
 
 .button-emoji {
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    margin-bottom: 10px;
+    font-size: 32px;  /* 이모지 크기 고정 */
+    margin-bottom: 8px;
     cursor: pointer;
     transition: var(--transition);
     background: none;
@@ -340,12 +344,12 @@ body {
 
 .button-input {
     width: 90%;
-    padding: 5px;
+    padding: 4px 6px;
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 5px;
     background: rgba(255, 255, 255, 0.9);
     text-align: center;
-    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    font-size: 12px;  /* 텍스트 크기 고정 */
 }
 
 .button-delete {
@@ -471,6 +475,53 @@ body {
     }
 }
 
+/* 큰 화면 (1024px 이상) */
+@media (min-width: 1024px) {
+    .vending-machine {
+        max-width: 750px;
+    }
+    
+    .buttons-grid {
+        gap: 15px;
+        padding: 20px;
+    }
+    
+    .vending-button {
+        min-height: 100px;
+        max-height: 140px;
+    }
+    
+    .button-emoji {
+        font-size: 36px;
+    }
+    
+    .button-input {
+        font-size: 13px;
+        padding: 5px 8px;
+    }
+}
+
+/* 태블릿 (768px ~ 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .vending-machine {
+        max-width: 600px;
+    }
+    
+    .buttons-grid {
+        gap: 12px;
+        padding: 18px;
+    }
+    
+    .vending-button {
+        min-height: 85px;
+        max-height: 120px;
+    }
+    
+    .button-emoji {
+        font-size: 30px;
+    }
+}
+
 /* 모바일 반응형 */
 @media (max-width: 768px) {
     body {
@@ -498,9 +549,42 @@ body {
         font-size: 14px;
     }
     
+    .vending-machine {
+        max-width: 100%;
+        padding: 15px;
+    }
+    
     .buttons-grid {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        /* 모바일에서도 4열 유지 */
+        grid-template-columns: repeat(4, 1fr);
         gap: 10px;
+        padding: 12px;
+    }
+    
+    .vending-button {
+        min-height: 75px;
+        max-height: 100px;
+    }
+    
+    .button-emoji {
+        font-size: 26px;
+    }
+    
+    .button-input {
+        font-size: 11px;
+        padding: 3px 5px;
+    }
+    
+    .button-number {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+    }
+    
+    .button-delete {
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
     }
     
     .name-input {
@@ -528,9 +612,47 @@ body {
     }
 }
 
+/* 작은 모바일 (480px 이하) */
 @media (max-width: 480px) {
+    .vending-machine {
+        padding: 10px;
+    }
+    
     .buttons-grid {
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        /* 작은 화면에서도 4열 유지 */
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        padding: 10px;
+    }
+    
+    .vending-button {
+        min-height: 65px;
+        max-height: 85px;
+    }
+    
+    .button-emoji {
+        font-size: 22px;
+    }
+    
+    .button-input {
+        font-size: 10px;
+        padding: 2px 4px;
+    }
+    
+    .button-number {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        top: 3px;
+        left: 3px;
+    }
+    
+    .button-delete {
+        width: 18px;
+        height: 18px;
+        font-size: 12px;
+        top: 3px;
+        right: 3px;
     }
     
     .emoji-selector-grid {
@@ -539,6 +661,40 @@ body {
     
     .emoji-picker {
         grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+/* 매우 작은 화면 (320px 이하) */
+@media (max-width: 320px) {
+    .buttons-grid {
+        gap: 4px;
+        padding: 8px;
+    }
+    
+    .vending-button {
+        min-height: 55px;
+        max-height: 70px;
+    }
+    
+    .button-emoji {
+        font-size: 18px;
+    }
+    
+    .button-input {
+        font-size: 9px;
+        padding: 2px 3px;
+    }
+    
+    .button-number {
+        width: 16px;
+        height: 16px;
+        font-size: 9px;
+    }
+    
+    .button-delete {
+        width: 16px;
+        height: 16px;
+        font-size: 11px;
     }
 }
 
