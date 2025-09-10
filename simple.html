@@ -225,6 +225,20 @@
             border-color: #667eea;
         }
 
+        .vending-item.editable {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                border-color: #e0e0e0;
+            }
+            50% {
+                border-color: #667eea;
+                box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+            }
+        }
+
         .vending-item.empty {
             background: #f5f5f5;
             border: 2px dashed #d0d0d0;
@@ -251,6 +265,24 @@
             justify-content: center;
             font-size: 0.85rem;
             font-weight: bold;
+        }
+
+        .edit-hint {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #ffa500;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .vending-item:hover .edit-hint {
+            opacity: 1;
         }
 
         .item-emoji {
@@ -319,6 +351,28 @@
         .btn-reset:hover {
             background: #dc2626;
             transform: translateY(-2px);
+        }
+
+        /* 알림 메시지 */
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .modal {
@@ -450,6 +504,21 @@
             background: #d0d0d0;
         }
 
+        .modal-delete {
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .modal-delete:hover {
+            background: #ff5252;
+        }
+
         /* 인쇄 스타일 */
         @media print {
             body {
@@ -458,7 +527,8 @@
 
             .theme-selector,
             .controls,
-            .bottom-controls {
+            .bottom-controls,
+            .edit-hint {
                 display: none !important;
             }
 
@@ -526,6 +596,9 @@
         <button class="theme-btn forest" onclick="changeTheme('forest')" title="숲 테마"></button>
     </div>
 
+    <!-- 알림 메시지 -->
+    <div class="notification" id="notification"></div>
+
     <div class="container" id="mainContainer">
         <div class="header">
             <h1 id="title">엄마 자판기</h1>
@@ -561,7 +634,7 @@
     <div class="modal" id="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>버튼 만들기</h2>
+                <h2 id="modalTitle">버튼 만들기</h2>
                 <div class="selected-emoji-display" id="selectedEmojiDisplay">🎨</div>
             </div>
             
@@ -579,6 +652,8 @@
                 <button class="modal-btn modal-confirm" onclick="confirmItem()">확인</button>
                 <button class="modal-btn modal-cancel" onclick="closeModal()">취소</button>
             </div>
+            
+            <button class="modal-delete" id="deleteBtn" onclick="deleteItem()" style="display: none;">🗑️ 이 버튼 삭제</button>
         </div>
     </div>
 
@@ -665,6 +740,17 @@
             }
         }
 
+        // 알림 메시지 표시
+        function showNotification(message, duration = 3000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+
         // 테마 변경
         function changeTheme(theme) {
             currentTheme = theme;
@@ -729,7 +815,7 @@
         }
 
         // 그리드 렌더링
-        function renderGrid() {
+        function renderGrid(animate = false) {
             const grid = document.getElementById('vendingGrid');
             grid.innerHTML = '';
             
@@ -739,13 +825,21 @@
                 const div = document.createElement('div');
                 
                 if (item) {
-                    div.className = 'vending-item';
+                    div.className = animate ? 'vending-item editable' : 'vending-item';
                     div.innerHTML = `
+                        <span class="edit-hint">수정</span>
                         <span class="item-number">${i + 1}</span>
                         <span class="item-emoji">${item.emoji}</span>
                         <span class="item-text">${item.text}</span>
                     `;
                     div.onclick = () => editItem(i);
+                    
+                    // 애니메이션 제거
+                    if (animate) {
+                        setTimeout(() => {
+                            div.classList.remove('editable');
+                        }, 3000);
+                    }
                 } else {
                     div.className = 'vending-item empty';
                 }
@@ -763,7 +857,7 @@
             }
             editingIndex = items.length;
             selectedEmoji = '🎨'; // 기본 이모지로 초기화
-            openModal();
+            openModal(false);
         }
 
         // 아이템 편집
@@ -773,14 +867,31 @@
             if (item) {
                 selectedEmoji = item.emoji;
                 document.getElementById('textInput').value = item.text;
-                openModal();
+                openModal(true);
+            }
+        }
+
+        // 아이템 삭제
+        function deleteItem() {
+            if (editingIndex !== null && editingIndex < vendingData[currentType].items.length) {
+                if (confirm('정말 이 버튼을 삭제하시겠습니까?')) {
+                    vendingData[currentType].items.splice(editingIndex, 1);
+                    saveToStorage();
+                    renderGrid();
+                    closeModal();
+                    showNotification('✅ 버튼이 삭제되었습니다.');
+                }
             }
         }
 
         // 모달 열기
-        function openModal() {
+        function openModal(isEdit = false) {
             document.getElementById('modal').classList.add('active');
+            document.getElementById('modalTitle').textContent = isEdit ? '버튼 수정하기' : '버튼 만들기';
             document.getElementById('selectedEmojiDisplay').textContent = selectedEmoji;
+            
+            // 삭제 버튼 표시/숨김
+            document.getElementById('deleteBtn').style.display = isEdit ? 'block' : 'none';
             
             // 이전 선택 초기화
             document.querySelectorAll('.emoji-btn').forEach(btn => {
@@ -791,7 +902,7 @@
             });
             
             // 편집 모드가 아닌 경우 텍스트 필드 초기화
-            if (editingIndex >= vendingData[currentType].items.length) {
+            if (!isEdit) {
                 document.getElementById('textInput').value = '';
             }
             
@@ -850,11 +961,17 @@
 
         // 예시 불러오기
         function loadExample() {
-            if (confirm('현재 내용을 모두 지우고 예시를 불러올까요?')) {
-                vendingData[currentType].items = [...examples[currentType]];
-                saveToStorage();
-                renderGrid();
+            if (vendingData[currentType].items.length > 0) {
+                if (!confirm('현재 내용을 모두 지우고 예시를 불러올까요?')) {
+                    return;
+                }
             }
+            
+            vendingData[currentType].items = [...examples[currentType]];
+            saveToStorage();
+            renderGrid(true); // 애니메이션과 함께 렌더링
+            
+            showNotification('💡 예시를 불러왔습니다. 각 버튼을 클릭해서 수정할 수 있어요!');
         }
 
         // 전체 삭제 (현재 탭)
@@ -873,8 +990,11 @@
             // 버튼들 숨기기
             const controls = document.querySelector('.controls');
             const bottomControls = document.querySelector('.bottom-controls');
+            const editHints = document.querySelectorAll('.edit-hint');
+            
             controls.style.display = 'none';
             bottomControls.style.display = 'none';
+            editHints.forEach(hint => hint.style.display = 'none');
             
             html2canvas(container, {
                 backgroundColor: null,
@@ -884,6 +1004,7 @@
                 // 버튼들 다시 보이기
                 controls.style.display = 'flex';
                 bottomControls.style.display = 'flex';
+                editHints.forEach(hint => hint.style.display = '');
                 
                 // 이미지 다운로드
                 const link = document.createElement('a');
@@ -892,6 +1013,8 @@
                 link.download = `${name}_자판기_${date}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
+                
+                showNotification('📸 이미지가 저장되었습니다!');
             });
         }
 
@@ -915,7 +1038,7 @@
                     renderGrid();
                     updateTitle();
                     
-                    alert('✅ 모든 데이터가 초기화되었습니다.');
+                    showNotification('✅ 모든 데이터가 초기화되었습니다.');
                 }
             }
         }
