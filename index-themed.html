@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -22,21 +22,21 @@
             transition: background 0.5s ease;
         }
 
-        /* 배경 테마 */
+        /* 배경 테마 - 눈의 피로를 줄이기 위해 어둡고 차분한 색상 사용 */
         body.theme-purple {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4c4b63 0%, #312e4f 100%);
         }
 
         body.theme-ocean {
-            background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
         }
 
         body.theme-sunset {
-            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            background: linear-gradient(135deg, #5d4e42 0%, #4a3f36 100%);
         }
 
         body.theme-forest {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: linear-gradient(135deg, #2d4a3e 0%, #1e3a2e 100%);
         }
 
         .container {
@@ -130,19 +130,19 @@
         }
 
         .theme-btn.purple {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         }
 
         .theme-btn.ocean {
-            background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         }
 
         .theme-btn.sunset {
-            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
         }
 
         .theme-btn.forest {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
         }
 
         .header {
@@ -297,22 +297,22 @@
         }
 
         .btn-example {
-            background: #ffa500;
+            background: #6b7280;
             color: white;
         }
 
         .btn-example:hover {
-            background: #ff8c00;
+            background: #4b5563;
             transform: translateY(-2px);
         }
 
         .btn-clear {
-            background: #ff6b6b;
+            background: #ef4444;
             color: white;
         }
 
         .btn-clear:hover {
-            background: #ff5252;
+            background: #dc2626;
             transform: translateY(-2px);
         }
 
@@ -472,7 +472,7 @@
             position: absolute;
             top: 8px;
             left: 8px;
-            background: #ffa500;
+            background: #6b7280;
             color: white;
             padding: 2px 6px;
             border-radius: 5px;
@@ -542,12 +542,12 @@
         }
 
         .btn-capture {
-            background: #00c896;
+            background: #10b981;
             color: white;
         }
 
         .btn-capture:hover {
-            background: #00a77a;
+            background: #059669;
             transform: translateY(-2px);
         }
 
@@ -674,9 +674,30 @@
         }
 
         .emoji-btn.selected {
-            background: #667eea;
-            border-color: #5a67d8;
+            background: #8b5cf6;
+            border-color: #7c3aed;
             transform: scale(1.1);
+        }
+
+        /* 테마별 이모지 선택 색상 */
+        .theme-purple .emoji-btn.selected {
+            background: #8b5cf6;
+            border-color: #7c3aed;
+        }
+
+        .theme-ocean .emoji-btn.selected {
+            background: #0ea5e9;
+            border-color: #0284c7;
+        }
+
+        .theme-sunset .emoji-btn.selected {
+            background: #f97316;
+            border-color: #ea580c;
+        }
+
+        .theme-forest .emoji-btn.selected {
+            background: #22c55e;
+            border-color: #16a34a;
         }
 
         .text-input-section {
@@ -701,7 +722,24 @@
 
         .text-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #8b5cf6;
+        }
+
+        /* 테마별 입력 포커스 색상 */
+        .theme-purple .text-input:focus {
+            border-color: #8b5cf6;
+        }
+
+        .theme-ocean .text-input:focus {
+            border-color: #0ea5e9;
+        }
+
+        .theme-sunset .text-input:focus {
+            border-color: #f97316;
+        }
+
+        .theme-forest .text-input:focus {
+            border-color: #22c55e;
         }
 
         .modal-buttons {
@@ -720,12 +758,41 @@
         }
 
         .modal-confirm {
-            background: #667eea;
+            background: #8b5cf6;
             color: white;
         }
 
-        .modal-confirm:hover {
-            background: #5a67d8;
+        /* 테마별 확인 버튼 색상 */
+        .theme-purple .modal-confirm {
+            background: #8b5cf6;
+        }
+
+        .theme-purple .modal-confirm:hover {
+            background: #7c3aed;
+        }
+
+        .theme-ocean .modal-confirm {
+            background: #0ea5e9;
+        }
+
+        .theme-ocean .modal-confirm:hover {
+            background: #0284c7;
+        }
+
+        .theme-sunset .modal-confirm {
+            background: #f97316;
+        }
+
+        .theme-sunset .modal-confirm:hover {
+            background: #ea580c;
+        }
+
+        .theme-forest .modal-confirm {
+            background: #22c55e;
+        }
+
+        .theme-forest .modal-confirm:hover {
+            background: #16a34a;
         }
 
         .modal-cancel {
@@ -738,7 +805,7 @@
         }
 
         .modal-delete {
-            background: #ff6b6b;
+            background: #ef4444;
             color: white;
             padding: 8px 16px;
             border: none;
@@ -749,7 +816,7 @@
         }
 
         .modal-delete:hover {
-            background: #ff5252;
+            background: #dc2626;
         }
 
         /* 인쇄 스타일 */
@@ -1218,7 +1285,7 @@
             }
         }
 
-        // 이미지 캡처 - 배경 포함 버전
+        // 이미지 캡처 - 테마별 배경색 적용
         function captureImage() {
             const container = document.getElementById('mainContainer');
             
@@ -1234,18 +1301,22 @@
             bottomControls.style.display = 'none';
             editHints.forEach(hint => hint.style.display = 'none');
             
-            // 배경 스타일 가져오기
-            const bodyStyles = window.getComputedStyle(document.body);
-            const backgroundGradient = bodyStyles.backgroundImage;
+            // 테마별 배경색 설정 (밝은 색상으로 캡처)
+            const themeBackgrounds = {
+                purple: 'linear-gradient(135deg, #e9d5ff 0%, #c084fc 100%)',
+                ocean: 'linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%)',
+                sunset: 'linear-gradient(135deg, #fed7aa 0%, #fdba74 100%)',
+                forest: 'linear-gradient(135deg, #86efac 0%, #4ade80 100%)'
+            };
             
             html2canvas(container, {
                 backgroundColor: null,
                 scale: 2,
                 logging: false,
                 onclone: (clonedDoc) => {
-                    // 클론된 문서에 배경 추가
+                    // 클론된 문서에 밝은 배경 추가
                     const clonedContainer = clonedDoc.getElementById('mainContainer');
-                    clonedContainer.style.background = backgroundGradient;
+                    clonedContainer.style.background = themeBackgrounds[currentTheme];
                     clonedContainer.style.padding = '40px';
                     clonedContainer.style.borderRadius = '20px';
                 }
