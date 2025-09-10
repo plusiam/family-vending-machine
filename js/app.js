@@ -188,10 +188,469 @@ class VendingMachineAppClass {
     }
     
     /**
-     * 이모지 선택기 표시 (역할별 이모지)
+     * 이모지 선택기 표시 (역할별 이모지) - 개선된 버전
      * @param {string} role - 역할 ID
      */
     showEmojiSelector(role) {
+        const machine = this.machines[role];
+        if (!machine) return;
+        
+        // 역할별 이모지 배열 가져오기
+        const emojis = this.config.roleEmojis[role] || this.config.emojis;
+        
+        // 개선된 이모지 선택 모달 생성
+        this.createImprovedEmojiModal(role, emojis);
+    }
+    
+    /**
+     * 개선된 이모지 선택 모달 생성 - 2단계 플로우
+     * @param {string} role - 역할 ID
+     * @param {Array} emojis - 이모지 배열
+     */
+    createImprovedEmojiModal(role, emojis) {
+        // 기존 모달 제거
+        const existingModal = document.getElementById('emojiSelectorModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // 모달 생성
+        const modal = document.createElement('div');
+        modal.id = 'emojiSelectorModal';
+        modal.className = 'emoji-selector-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        `;
+        
+        const content = document.createElement('div');
+        content.className = 'emoji-selector-content';
+        content.style.cssText = `
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        `;
+        
+        // 현재 단계
+        let currentStep = 1;
+        let selectedEmoji = '';
+        
+        // 단계 표시기
+        const progressBar = document.createElement('div');
+        progressBar.style.cssText = `
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        `;
+        
+        const step1Dot = document.createElement('div');
+        const step2Dot = document.createElement('div');
+        
+        const updateProgress = () => {
+            const dotStyle = `
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                transition: all 0.3s;
+            `;
+            
+            step1Dot.style.cssText = dotStyle + (currentStep >= 1 ? 
+                'background: #667eea; transform: scale(1.2);' : 
+                'background: #ddd;');
+            step2Dot.style.cssText = dotStyle + (currentStep >= 2 ? 
+                'background: #667eea; transform: scale(1.2);' : 
+                'background: #ddd;');
+        };
+        
+        progressBar.appendChild(step1Dot);
+        progressBar.appendChild(step2Dot);
+        
+        // 타이틀
+        const title = document.createElement('h2');
+        const roleLabel = this.config.roles.find(r => r.id === role)?.label || role;
+        title.style.cssText = 'text-align: center; margin-bottom: 10px; color: #333;';
+        
+        const subtitle = document.createElement('p');
+        subtitle.style.cssText = 'text-align: center; margin-bottom: 30px; color: #666;';
+        
+        // 단계별 컨텐츠 컨테이너
+        const stepContainer = document.createElement('div');
+        
+        // 스텝 1: 이모지 선택
+        const createStep1 = () => {
+            title.textContent = `${roleLabel} 자판기 버튼 만들기`;
+            subtitle.textContent = '좋아하는 것을 나타내는 이모지를 선택하세요!';
+            
+            stepContainer.innerHTML = '';
+            
+            const grid = document.createElement('div');
+            grid.style.cssText = `
+                display: grid;
+                grid-template-columns: repeat(6, 1fr);
+                gap: 15px;
+                margin-bottom: 20px;
+            `;
+            
+            // 이모지 버튼 생성
+            emojis.forEach(emoji => {
+                const emojiBtn = document.createElement('button');
+                emojiBtn.className = 'emoji-selector-button';
+                emojiBtn.textContent = emoji;
+                emojiBtn.style.cssText = `
+                    font-size: 2em;
+                    padding: 15px;
+                    border: 2px solid #ddd;
+                    border-radius: 15px;
+                    background: white;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                `;
+                
+                emojiBtn.addEventListener('mouseenter', () => {
+                    emojiBtn.style.transform = 'scale(1.2)';
+                    emojiBtn.style.borderColor = '#667eea';
+                    emojiBtn.style.background = '#f0f4ff';
+                });
+                
+                emojiBtn.addEventListener('mouseleave', () => {
+                    if (selectedEmoji !== emoji) {
+                        emojiBtn.style.transform = 'scale(1)';
+                        emojiBtn.style.borderColor = '#ddd';
+                        emojiBtn.style.background = 'white';
+                    }
+                });
+                
+                emojiBtn.addEventListener('click', () => {
+                    // 모든 버튼 스타일 초기화
+                    grid.querySelectorAll('button').forEach(btn => {
+                        btn.style.transform = 'scale(1)';
+                        btn.style.borderColor = '#ddd';
+                        btn.style.background = 'white';
+                    });
+                    
+                    // 선택된 버튼 강조
+                    selectedEmoji = emoji;
+                    emojiBtn.style.transform = 'scale(1.2)';
+                    emojiBtn.style.borderColor = '#667eea';
+                    emojiBtn.style.background = '#f0f4ff';
+                    
+                    // 자동으로 다음 단계로
+                    setTimeout(() => {
+                        currentStep = 2;
+                        updateProgress();
+                        createStep2();
+                    }, 300);
+                });
+                
+                grid.appendChild(emojiBtn);
+            });
+            
+            stepContainer.appendChild(grid);
+        };
+        
+        // 스텝 2: 텍스트 입력
+        const createStep2 = () => {
+            title.textContent = `선택한 이모지: ${selectedEmoji}`;
+            subtitle.textContent = '이 이모지의 이름을 지어주세요!';
+            
+            stepContainer.innerHTML = '';
+            
+            // 큰 이모지 표시
+            const bigEmoji = document.createElement('div');
+            bigEmoji.textContent = selectedEmoji;
+            bigEmoji.style.cssText = `
+                font-size: 4em;
+                text-align: center;
+                margin-bottom: 20px;
+                animation: bounce 0.5s ease;
+            `;
+            
+            // 추천 텍스트
+            const suggestions = {
+                '🍰': ['요리하기', '베이킹', '케이크', '디저트'],
+                '🍕': ['피자', '맛집탐방', '외식', '배달음식'],
+                '🎮': ['게임', '플레이', '놀이', '취미'],
+                '📚': ['독서', '공부', '책읽기', '도서관'],
+                '🎨': ['그림그리기', '미술', '창작', '예술'],
+                '⚽': ['축구', '운동', '스포츠', '경기'],
+                '🎵': ['음악듣기', '노래', '멜로디', '음악감상'],
+                '🚗': ['드라이브', '자동차', '여행', '운전']
+            };
+            
+            const suggestionChips = document.createElement('div');
+            suggestionChips.style.cssText = `
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+                margin-bottom: 20px;
+            `;
+            
+            const chips = suggestions[selectedEmoji] || ['좋아해요', '즐겨요', '최고예요', '재미있어요'];
+            chips.forEach(text => {
+                const chip = document.createElement('button');
+                chip.textContent = text;
+                chip.style.cssText = `
+                    padding: 6px 12px;
+                    background: #e3f2fd;
+                    border: 1px solid #2196f3;
+                    border-radius: 15px;
+                    color: #1976d2;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: all 0.2s;
+                `;
+                
+                chip.addEventListener('click', () => {
+                    textInput.value = text;
+                    textInput.focus();
+                });
+                
+                chip.addEventListener('mouseenter', () => {
+                    chip.style.background = '#2196f3';
+                    chip.style.color = 'white';
+                });
+                
+                chip.addEventListener('mouseleave', () => {
+                    chip.style.background = '#e3f2fd';
+                    chip.style.color = '#1976d2';
+                });
+                
+                suggestionChips.appendChild(chip);
+            });
+            
+            // 텍스트 입력
+            const textInputWrapper = document.createElement('div');
+            textInputWrapper.style.cssText = 'text-align: center; margin-bottom: 20px;';
+            
+            const textInput = document.createElement('input');
+            textInput.type = 'text';
+            textInput.placeholder = '예: 요리하기';
+            textInput.maxLength = 15;
+            textInput.style.cssText = `
+                width: 80%;
+                padding: 15px;
+                font-size: 18px;
+                border: 2px solid #ddd;
+                border-radius: 10px;
+                text-align: center;
+                transition: all 0.3s;
+            `;
+            
+            textInput.addEventListener('focus', () => {
+                textInput.style.borderColor = '#667eea';
+                textInput.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+            });
+            
+            textInput.addEventListener('blur', () => {
+                textInput.style.borderColor = '#ddd';
+                textInput.style.boxShadow = 'none';
+            });
+            
+            const charCounter = document.createElement('div');
+            charCounter.style.cssText = 'margin-top: 5px; font-size: 12px; color: #666;';
+            charCounter.textContent = '0/15';
+            
+            textInput.addEventListener('input', () => {
+                charCounter.textContent = `${textInput.value.length}/15`;
+            });
+            
+            // 완성 버튼
+            const completeBtn = document.createElement('button');
+            completeBtn.textContent = '✅ 완성하기';
+            completeBtn.style.cssText = `
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-top: 20px;
+                transition: all 0.3s;
+            `;
+            
+            completeBtn.addEventListener('click', () => {
+                const text = textInput.value.trim() || '';
+                this.addButtonWithEmojiAndText(role, selectedEmoji, text);
+                modal.remove();
+            });
+            
+            completeBtn.addEventListener('mouseenter', () => {
+                completeBtn.style.transform = 'translateY(-2px)';
+                completeBtn.style.boxShadow = '0 5px 15px rgba(102, 126, 234, 0.3)';
+            });
+            
+            completeBtn.addEventListener('mouseleave', () => {
+                completeBtn.style.transform = 'translateY(0)';
+                completeBtn.style.boxShadow = 'none';
+            });
+            
+            // Enter 키로 완성
+            textInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    completeBtn.click();
+                }
+            });
+            
+            // 요소 추가
+            stepContainer.appendChild(bigEmoji);
+            stepContainer.appendChild(suggestionChips);
+            textInputWrapper.appendChild(textInput);
+            textInputWrapper.appendChild(charCounter);
+            stepContainer.appendChild(textInputWrapper);
+            stepContainer.appendChild(completeBtn);
+            
+            // 입력 필드에 자동 포커스
+            setTimeout(() => {
+                textInput.focus();
+            }, 100);
+        };
+        
+        // 닫기 버튼
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '×';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        `;
+        
+        closeBtn.addEventListener('click', () => modal.remove());
+        closeBtn.addEventListener('mouseenter', () => {
+            closeBtn.style.background = '#f44336';
+            closeBtn.style.color = 'white';
+        });
+        closeBtn.addEventListener('mouseleave', () => {
+            closeBtn.style.background = 'none';
+            closeBtn.style.color = '#666';
+        });
+        
+        // 조립
+        content.appendChild(closeBtn);
+        content.appendChild(progressBar);
+        content.appendChild(title);
+        content.appendChild(subtitle);
+        content.appendChild(stepContainer);
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+        
+        // 초기 단계 설정
+        updateProgress();
+        createStep1();
+        
+        // 모달 외부 클릭 시 닫기
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+        
+        // 애니메이션 스타일 추가
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    /**
+     * 이모지와 텍스트로 버튼 추가 (개선된 버전)
+     * @param {string} role - 역할 ID
+     * @param {string} emoji - 선택한 이모지
+     * @param {string} text - 입력한 텍스트
+     */
+    addButtonWithEmojiAndText(role, emoji, text) {
+        const machine = this.machines[role];
+        if (!machine) return;
+        
+        // 버튼 생성
+        const button = machine.addButton({ emoji: emoji, text: text });
+        
+        if (button) {
+            // 성공 메시지
+            this.showSuccessMessage('버튼이 추가되었습니다! 🎉');
+        }
+    }
+    
+    /**
+     * 성공 메시지 표시
+     * @param {string} message - 메시지 내용
+     */
+    showSuccessMessage(message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4caf50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+            z-index: 10001;
+            animation: slideInUp 0.3s ease;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOutDown 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
+        
+        // 애니메이션 스타일 추가
+        if (!document.getElementById('toastAnimations')) {
+            const style = document.createElement('style');
+            style.id = 'toastAnimations';
+            style.textContent = `
+                @keyframes slideInUp {
+                    from { opacity: 0; transform: translate(-50%, 100%); }
+                    to { opacity: 1; transform: translate(-50%, 0); }
+                }
+                @keyframes slideOutDown {
+                    from { opacity: 1; transform: translate(-50%, 0); }
+                    to { opacity: 0; transform: translate(-50%, 100%); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
+    /**
+     * 기존 이모지 선택기 표시 (호환성 유지)
+     * @param {string} role - 역할 ID
+     */
+    showEmojiSelectorLegacy(role) {
         const machine = this.machines[role];
         if (!machine) return;
         
@@ -203,7 +662,7 @@ class VendingMachineAppClass {
     }
     
     /**
-     * 이모지 선택 모달 생성
+     * 이모지 선택 모달 생성 (기존 버전)
      * @param {string} role - 역할 ID
      * @param {Array} emojis - 이모지 배열
      */
@@ -332,7 +791,7 @@ class VendingMachineAppClass {
     }
     
     /**
-     * 선택한 이모지로 버튼 추가
+     * 선택한 이모지로 버튼 추가 (기존 버전 - 개선)
      * @param {string} role - 역할 ID
      * @param {string} emoji - 선택한 이모지
      */
@@ -343,14 +802,79 @@ class VendingMachineAppClass {
         // 선택한 이모지로 버튼 생성
         const button = machine.addButton({ emoji: emoji, text: '' });
         if (button) {
-            // 입력 필드에 포커스
-            setTimeout(() => {
+            // 입력 필드에 포커스 - 타이밍 개선
+            requestAnimationFrame(() => {
                 const buttonElement = document.querySelector(`[data-button-id="${button.id}"] .button-input`);
                 if (buttonElement) {
                     buttonElement.focus();
+                    buttonElement.select(); // 전체 선택
+                    
+                    // 시각적 피드백
+                    const vendingButton = buttonElement.closest('.vending-button');
+                    if (vendingButton) {
+                        vendingButton.style.animation = 'pulse 0.5s ease';
+                        setTimeout(() => {
+                            vendingButton.style.animation = '';
+                        }, 500);
+                    }
                 }
-            }, 100);
+            });
+            
+            // 안내 메시지
+            this.showHelpTooltip(button.id, '이제 텍스트를 입력해주세요!');
         }
+    }
+    
+    /**
+     * 도움말 툴팁 표시
+     * @param {string} buttonId - 버튼 ID
+     * @param {string} message - 메시지
+     */
+    showHelpTooltip(buttonId, message) {
+        const buttonElement = document.querySelector(`[data-button-id="${buttonId}"]`);
+        if (!buttonElement) return;
+        
+        const tooltip = document.createElement('div');
+        tooltip.textContent = message;
+        tooltip.style.cssText = `
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1001;
+            margin-bottom: 5px;
+            animation: fadeIn 0.3s ease;
+        `;
+        
+        // 화살표 추가
+        const arrow = document.createElement('div');
+        arrow.style.cssText = `
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #333;
+        `;
+        
+        tooltip.appendChild(arrow);
+        buttonElement.style.position = 'relative';
+        buttonElement.appendChild(tooltip);
+        
+        // 3초 후 제거
+        setTimeout(() => {
+            tooltip.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => tooltip.remove(), 300);
+        }, 3000);
     }
     
     /**
@@ -484,6 +1008,16 @@ class VendingMachineAppClass {
             const button = machine.buttons.find(b => b.id === buttonId);
             if (button) {
                 machine.updateButton(buttonId, { emoji });
+                
+                // 텍스트 입력 필드로 포커스 이동
+                requestAnimationFrame(() => {
+                    const inputElement = document.querySelector(`[data-button-id="${buttonId}"] .button-input`);
+                    if (inputElement) {
+                        inputElement.focus();
+                        inputElement.select();
+                    }
+                });
+                
                 break;
             }
         }
